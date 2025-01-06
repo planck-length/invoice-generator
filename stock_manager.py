@@ -10,14 +10,16 @@ def stock_management():
         c = conn.cursor()
 
         # Fetch all stock items
-        c.execute(
-            """SELECT id, product_name, price, start_quantity, 
-                    (start_quantity - sold_quantity) AS current_quantity, 
-                    sold_quantity, 
-                    (sold_quantity * price) AS total_amount_sold, 
-                    ((start_quantity - sold_quantity) * price) AS total_amount_current 
-                    FROM stock"""
-        )
+        # c.execute(
+        #     """SELECT id, product_name, price, start_quantity, 
+        #             (start_quantity - sold_quantity) AS current_quantity, 
+        #             sold_quantity, 
+        #             (sold_quantity * price) AS total_amount_sold, 
+        #             ((start_quantity - sold_quantity) * price) AS total_amount_current 
+        #             FROM stock"""
+        # )
+        c.execute("""SELECT * FROM stock_view""")
+
         products = c.fetchall()
 
     return render_template("stock.html", products=products)
@@ -30,10 +32,14 @@ def add_stock_item():
 
     with sqlite3.connect(DATABASE_NAME) as conn:
         c = conn.cursor()
+        max_id = c.execute("SELECT COALESCE(MAX(id),0) FROM product").fetchone()[0]
+        product_id = max_id + 1
+        c.execute("INSERT INTO product (name,price) VALUES (?, ?)", (product_name, price))
         c.execute(
-            "INSERT INTO stock (product_name, price, start_quantity, sold_quantity) VALUES (?, ?, ?, ?)",
-            (product_name, price, start_quantity, 0),
+            "INSERT INTO stock (product_id, product_name, start_quantity) VALUES (?, ?, ?)",
+            (product_id, product_name, start_quantity),
         )
+
         conn.commit()
 
     return redirect(url_for("stock_management"))
@@ -88,15 +94,31 @@ def export_stock():
 def init_db():
     with sqlite3.connect(DATABASE_NAME) as conn:
         c = conn.cursor()
-        # Add stock table
+        # CREATE VIEW TO SHOW CURRENT PRODUCT STATUS, AMOUNT SOLD, AMOUNT CURRENT
         c.execute(
             """CREATE TABLE IF NOT EXISTS stock (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        product_id INTEGER,
                         product_name TEXT,
-                        price REAL,
                         start_quantity INTEGER,
-                        sold_quantity INTEGER
                         created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                        updated_date TIMESTAMP
                     )"""
         )
+        c.execute(
+            """CREATE VIEW IF NOT EXISTS stock_view AS
+                SELECT p.id, p.name as product_name, 
+                            p.price, st.start_quantity
+                            ,SUM(s.quantity) as sold_quantity,
+                            SUM(s.quantity*p.price) as total_amount_sold,
+                            (st.start_quantity-SUM(s.quantity)) as current_quantity,
+                            (st.start_quantity-SUM(s.quantity))*p.price as total_amount_current,
+                            group_concat(i.id) as aggregated_invoices
+                    FROM sales s 
+                    INNER JOIN product p ON p.id=s.product_id 
+                    LEFT JOIN invoice i ON i.id=s.invoice_id
+                    INNER JOIN stock st ON st.product_id=p.id
+                    WHERE p.is_current=TRUE
+                    GROUP BY p.id
+                    ORDER BY p.id"""
+        )
+        conn.commit()

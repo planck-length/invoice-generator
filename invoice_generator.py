@@ -16,15 +16,20 @@ def init_db():
         c.execute(
             """CREATE TABLE IF NOT EXISTS sales (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        item_description TEXT,
+                        product_id INTEGER,
                         quantity INTEGER,
-                        price REAL
+                        invoice_id INTEGER,
+                        price REAL,
+                        created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )"""
         )
         c.execute(
-            """CREATE TABLE IF NOT EXISTS invoices (
+            """CREATE TABLE IF NOT EXISTS invoice (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        invoice_number TEXT
+                        invoice_number TEXT,
+                        customer_name TEXT,
+                        total_amount REAL,
+                        created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )"""
         )
         c.execute(
@@ -42,7 +47,7 @@ def init_db():
 def get_next_invoice_number():
     with sqlite3.connect("database.db") as conn:
         c = conn.cursor()
-        c.execute("SELECT MAX(id) FROM invoices")
+        c.execute("SELECT MAX(id) FROM invoice")
         result = c.fetchone()[0]
         next_invoice_number = f"INV-{(result + 1) if result else 1}"
         return next_invoice_number
@@ -58,15 +63,17 @@ def index():
             invoice_number = request.form.get("invoice_number")
 
         # Add an item to the current invoice
-        if "item_description" in request.form:
-            item_description = request.form.get("item_description")
+        if "quantity" in request.form:
+            product_id = request.form.get("product_id")
+            product_name = request.form.get("product_name")
             quantity = int(request.form.get("quantity"))
             price = float(request.form.get("price"))
             total = quantity * price
 
             current_invoice.append(
                 {
-                    "item_description": item_description,
+                    "product_id": product_id,
+                    "product_name": product_name,
                     "quantity": quantity,
                     "price": price,
                     "total": total,
@@ -96,14 +103,19 @@ def _update_db_with_current_invoice(
     global current_invoice
     with sqlite3.connect("database.db", autocommit=False) as conn:
         c = conn.cursor()
+        # max invoice number
+        c.execute("SELECT MAX(id) FROM invoice")
+        max_invoice_id= c.fetchone()[0] or 0
+        max_invoice_id += 1
+        
         # Save the invoice number to the database
-        c.execute("INSERT INTO invoices (invoice_number) VALUES (?)", (invoice_number,))
+        c.execute("INSERT INTO invoice (invoice_number) VALUES (?)", (invoice_number,))
 
         # Save current invoice items to the database
         for item in current_invoice:
             c.execute(
-                "INSERT INTO sales (item_description, quantity, price) VALUES (?, ?, ?)",
-                (item["item_description"], item["quantity"], item["price"]),
+                "INSERT INTO sales (product_id, quantity, price, invoice_id) VALUES (?, ?, ?, ?)",
+                (item["product_id"], item["quantity"], item["price"], max_invoice_id),
             )
         conn.commit()
 
@@ -122,7 +134,8 @@ def _export_pdf(invoice_number):
 
     # Header
     c.setFont("Helvetica-Bold", 12)
-    c.drawString(50, 720, "Item Description")
+    c.drawString(50, 720, "Product Id")
+    c.drawString(150, 720, "Product Name")
     c.drawString(300, 720, "Quantity")
     c.drawString(400, 720, "Price")
     c.drawString(500, 720, "Total")
@@ -131,7 +144,8 @@ def _export_pdf(invoice_number):
     c.setFont("Helvetica", 12)
     y = 700
     for item in current_invoice:
-        c.drawString(50, y, item["item_description"])
+        c.drawString(50, y, item["product_id"])
+        c.drawString(150, y, item["product_name"])
         c.drawString(300, y, str(item["quantity"]))
         c.drawString(400, y, f"{item['price']:.2f}")
         c.drawString(500, y, f"{item['total']:.2f}")
@@ -157,11 +171,11 @@ def _export_pdf(invoice_number):
     )
 
 
-def export_complete_invoice():
+def export_complete_invoice(request):
     global current_invoice
-    invoice_number = request.form.get("invoice_number")
+    invoice_number = request.form.get("invoice-number")
     _update_db_with_current_invoice(invoice_number)
-    _export_pdf(invoice_number)
+    return _export_pdf(invoice_number)
 
 
 def clear():

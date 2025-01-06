@@ -15,7 +15,6 @@ logger.setLevel(logging.DEBUG)
 @app.route("/", methods=["GET", "POST"])
 def index():
     return ig.index()
-    return render_template("index.html", **ig.index())
 
 
 @app.route("/remove/<int:item_index>", methods=["POST"])
@@ -25,7 +24,7 @@ def remove_item(item_index):
 
 @app.route("/export", methods=["POST"])
 def export_pdf():
-    return ig.export_complete_invoice()
+    return ig.export_complete_invoice(request)
 
 
 @app.route("/clear", methods=["POST"])
@@ -75,7 +74,7 @@ def product_details():
             conn.set_trace_callback(print)
             c = conn.cursor()
             c.execute(
-                "SELECT product_name,price FROM stock WHERE id = ?",
+                "SELECT name,price FROM product WHERE id = ?",
                 (int(product_id),) # Important: Cast product_id to integer
             )
             product = c.fetchone()
