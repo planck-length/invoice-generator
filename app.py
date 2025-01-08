@@ -49,6 +49,9 @@ def add_stock_item():
 def update_stock_item(product_id):
     return sm.update_stock_item(product_id)
 
+@app.route("/stock/delete/<int:product_id>", methods=["POST"])
+def delete_stock_item(product_id):
+    return sm.delete_stock_item(product_id)
 
 @app.route("/stock/export", methods=["GET"])
 def export_stock():

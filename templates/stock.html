@@ -40,6 +40,7 @@
             <th>Current Quantity</th>
             <th>Total Amount Current</th>
             <th>Invoices</th>
+            <th>Update Current Quantity</th>
         </tr>
         {% for product in products %}
         <tr>
@@ -51,6 +52,7 @@
             <td>{{ product[5] }}</td>
             <td>{{ product[6] }}</td>
             <td>{{ product[7] }}</td>
+            <td>{{ product[8] }}</td>
             <td>
                 <form action="/stock/update/{{ product[0] }}" method="POST" style="display:inline;">
                     <label for="price">Price:</label>

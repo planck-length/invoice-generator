@@ -31,6 +31,7 @@ def add_stock_item():
     start_quantity = int(request.form.get("start_quantity"))
 
     with sqlite3.connect(DATABASE_NAME) as conn:
+        conn.set_trace_callback(print)
         c = conn.cursor()
         max_id = c.execute("SELECT COALESCE(MAX(id),0) FROM product").fetchone()[0]
         product_id = max_id + 1
@@ -52,8 +53,27 @@ def update_stock_item(product_id):
     with sqlite3.connect(DATABASE_NAME) as conn:
         c = conn.cursor()
         c.execute(
-            "UPDATE stock SET price = ?, start_quantity = ? WHERE id = ?",
-            (price, start_quantity, product_id),
+            "UPDATE product SET price = ? WHERE id = ?",
+            (price, product_id),
+        )
+        c.execute(
+            "UPDATE stock SET start_quantity = ?, updated_date = CURRENT_TIMESTAMP WHERE product_id = ? ",
+            (start_quantity, product_id),
+        )
+        conn.commit()
+
+    return redirect(url_for("stock_management"))
+
+def delete_stock_item(product_id):
+    with sqlite3.connect(DATABASE_NAME) as conn:
+        c = conn.cursor()
+        c.execute(
+            "DELETE FROM product WHERE id = ?",
+            (product_id),
+        )
+        c.execute(
+            "DELETE FROM stock WHERE product_id = ?",
+            (product_id),
         )
         conn.commit()
 
@@ -101,22 +121,24 @@ def init_db():
                         product_id INTEGER,
                         product_name TEXT,
                         start_quantity INTEGER,
-                        created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_date TIMESTAMP 
                     )"""
         )
         c.execute(
             """CREATE VIEW IF NOT EXISTS stock_view AS
                 SELECT p.id, p.name as product_name, 
                             p.price, st.start_quantity
-                            ,SUM(s.quantity) as sold_quantity,
-                            SUM(s.quantity*p.price) as total_amount_sold,
-                            (st.start_quantity-SUM(s.quantity)) as current_quantity,
-                            (st.start_quantity-SUM(s.quantity))*p.price as total_amount_current,
-                            group_concat(i.id) as aggregated_invoices
-                    FROM sales s 
-                    INNER JOIN product p ON p.id=s.product_id 
-                    LEFT JOIN invoice i ON i.id=s.invoice_id
+                            ,
+                            COALESCE(SUM(s.quantity),0) as sold_quantity,
+                            COALESCE(SUM(s.quantity*p.price),0) as total_amount_sold,
+                            (st.start_quantity-COALESCE(SUM(s.quantity),0)) as current_quantity,
+                            (st.start_quantity-COALESCE(SUM(s.quantity),0))*p.price as total_amount_current,
+                            COALESCE(group_concat(i.id),'') as aggregated_invoices
+                    FROM product p
                     INNER JOIN stock st ON st.product_id=p.id
+                    LEFT JOIN sales s ON p.id=s.product_id 
+                    LEFT JOIN invoice i ON i.id=s.invoice_id
                     WHERE p.is_current=TRUE
                     GROUP BY p.id
                     ORDER BY p.id"""
