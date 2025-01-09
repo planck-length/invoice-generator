@@ -1,20 +1,35 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file
+from flask_babel import gettext as _,Babel
 import logging
 import sqlite3
-import io
 import invoice_generator as ig
 import stock_manager as sm
+from flask import jsonify  # Import jsonify
 
 app = Flask(__name__)
+
+
+babel = Babel(app, locale_selector=lambda :app.config.get("LANGUAGE", "bs"))
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
+
+# set language
+@app.route("/language/set", methods=["POST"])
+def set_language():
+    language = request.form.get("language")
+    app.config["LANGUAGE"] = language
+    return redirect(request.referrer)
+
+
 # Invoice Generator Routes
 @app.route("/", methods=["GET", "POST"])
 def index():
-    return ig.index()
+    return render_template(
+        "index.html", **ig.index(), language=app.config.get("LANGUAGE", "bs")
+    )
 
 
 @app.route("/remove/<int:item_index>", methods=["POST"])
@@ -49,26 +64,20 @@ def add_stock_item():
 def update_stock_item(product_id):
     return sm.update_stock_item(product_id)
 
+
 @app.route("/stock/delete/<int:product_id>", methods=["POST"])
 def delete_stock_item(product_id):
     return sm.delete_stock_item(product_id)
+
 
 @app.route("/stock/export", methods=["GET"])
 def export_stock():
     return sm.export_stock()
 
 
-# invoice_generator.py
-from flask import jsonify  # Import jsonify
-
-# ... other imports
-
-
-
-
-@app.route('/product_details', methods=['GET'])
+@app.route("/product_details", methods=["GET"])
 def product_details():
-    product_id = request.args.get('product_id')
+    product_id = request.args.get("product_id")
     if not product_id:
         return jsonify({})  # Return empty object if no ID provided
 
@@ -78,21 +87,21 @@ def product_details():
             c = conn.cursor()
             c.execute(
                 "SELECT name,price FROM product WHERE id = ?",
-                (int(product_id),) # Important: Cast product_id to integer
+                (int(product_id),),  # Important: Cast product_id to integer
             )
             product = c.fetchone()
 
             if product:
                 return jsonify({"product_name": product[0], "price": product[1]})
             else:
-                return jsonify({}) # Return empty object if product not found
-    except ValueError: # Handle non-integer input
-      return jsonify({})
+                return jsonify({})  # Return empty object if product not found
+    except ValueError:  # Handle non-integer input
+        return jsonify({})
 
 
 @app.route("/autocomplete", methods=["GET"])
 def autocomplete():
-    print('something')
+    print("something")
     product_id = request.args.get("product_id")  # Get the query string
     product_name = request.args.get("product_name")  # Get the query string
     if not (product_id or product_name):

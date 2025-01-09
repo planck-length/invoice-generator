@@ -8,16 +8,6 @@ import invoice_generator as ig
 def stock_management():
     with sqlite3.connect(DATABASE_NAME) as conn:
         c = conn.cursor()
-
-        # Fetch all stock items
-        # c.execute(
-        #     """SELECT id, product_name, price, start_quantity, 
-        #             (start_quantity - sold_quantity) AS current_quantity, 
-        #             sold_quantity, 
-        #             (sold_quantity * price) AS total_amount_sold, 
-        #             ((start_quantity - sold_quantity) * price) AS total_amount_current 
-        #             FROM stock"""
-        # )
         c.execute("""SELECT * FROM stock_view""")
 
         products = c.fetchall()

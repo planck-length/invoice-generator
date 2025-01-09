@@ -82,12 +82,18 @@ def index():
 
     total_amount = sum(item["total"] for item in current_invoice)
 
-    return render_template(
-        "index.html",
-        invoice=current_invoice,
-        total_amount=total_amount,
-        invoice_number=invoice_number,
-    )
+    # return render_template(
+    #     "index.html",
+    #     invoice=current_invoice,
+    #     total_amount=total_amount,
+    #     invoice_number=invoice_number,
+    #     language=app.config["LANGUAGE"],
+    # )
+    return {
+        "invoice": current_invoice,
+        "total_amount": total_amount,
+        "invoice_number": invoice_number,
+    }
 
 
 def remove_item(item_index):
@@ -105,9 +111,9 @@ def _update_db_with_current_invoice(
         c = conn.cursor()
         # max invoice number
         c.execute("SELECT MAX(id) FROM invoice")
-        max_invoice_id= c.fetchone()[0] or 0
+        max_invoice_id = c.fetchone()[0] or 0
         max_invoice_id += 1
-        
+
         # Save the invoice number to the database
         c.execute("INSERT INTO invoice (invoice_number) VALUES (?)", (invoice_number,))
 

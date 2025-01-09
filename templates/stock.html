@@ -4,43 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Management</title>
+    <title>{% trans %}Stock Management{% endtrans %}</title>  <!-- Translated title -->
     <link rel="stylesheet" href="/static/stock_manager.css">
 
 </head>
 
 <body>
-    <h1>Stock Management</h1>
+    <h1>{% trans %}Stock Management{% endtrans %}</h1> <!-- Translated heading -->
 
     <!-- Add Product Form -->
     <form action="/stock/add" method="POST">
-        <h3>Add Product</h3>
-        <label for="product_name">Product Name:</label>
+        <h3>{% trans %}Add Product{% endtrans %}</h3> <!-- Translated subheading -->
+        <label for="product_name">{% trans %}Product Name:{% endtrans %}</label> <!-- Translated label -->
         <input type="text" id="product_name" name="product_name" required>
 
-        <label for="price">Price:</label>
+        <label for="price">{% trans %}Price:{% endtrans %}</label> <!-- Translated label -->
         <input type="number" id="price" name="price" step="0.01" required>
 
-        <label for="start_quantity">Start Quantity:</label>
+        <label for="start_quantity">{% trans %}Start Quantity:{% endtrans %}</label> <!-- Translated label -->
         <input type="number" id="start_quantity" name="start_quantity" required min="1">
 
-        <button type="submit">Add Product</button>
+        <button type="submit">{% trans %}Add Product{% endtrans %}</button> <!-- Translated button -->
     </form>
 
     <!-- Stock Table -->
-    <h3>Current Stock</h3>
+    <h3>{% trans %}Current Stock{% endtrans %}</h3> <!-- Translated subheading -->
     <table>
         <tr>
-            <th>Product Id</th>
-            <th>Product Name</th>
-            <th>Price</th>
-            <th>Start Quantity</th>
-            <th>Sold Quantity</th>
-            <th>Total Amount Sold</th>
-            <th>Current Quantity</th>
-            <th>Total Amount Current</th>
-            <th>Invoices</th>
-            <th>Update Current Quantity</th>
+            <th>{% trans %}Product Id{% endtrans %}</th> <!-- Translated table headers -->
+            <th>{% trans %}Product Name{% endtrans %}</th>
+            <th>{% trans %}Price{% endtrans %}</th>
+            <th>{% trans %}Start Quantity{% endtrans %}</th>
+            <th>{% trans %}Sold Quantity{% endtrans %}</th>
+            <th>{% trans %}Total Amount Sold{% endtrans %}</th>
+            <th>{% trans %}Current Quantity{% endtrans %}</th>
+            <th>{% trans %}Total Amount Current{% endtrans %}</th>
+            <th>{% trans %}Invoices{% endtrans %}</th>
+            <th>{% trans %}Update Current Quantity{% endtrans %}</th> 
         </tr>
         {% for product in products %}
         <tr>
@@ -55,11 +55,11 @@
             <td>{{ product[8] }}</td>
             <td>
                 <form action="/stock/update/{{ product[0] }}" method="POST" style="display:inline;">
-                    <label for="price">Price:</label>
+                    <label for="price">{% trans %}Price:{% endtrans %}</label> <!-- Translated label -->
                     <input type="number" name="price" step="0.01" value="{{ product[2] }}" required>
-                    <label for="start_quantity">Start Quantity:</label>
+                    <label for="start_quantity">{% trans %}Start Quantity:{% endtrans %}</label> <!-- Translated label -->
                     <input type="number" name="start_quantity" value="{{ product[3] }}" required>
-                    <button type="submit">Update</button>
+                    <button type="submit">{% trans %}Update{% endtrans %}</button> <!-- Translated button -->
                 </form>
             </td>
         </tr>
@@ -68,12 +68,12 @@
 
     <!-- Export Button -->
     <form action="/stock/export" method="GET">
-        <button type="submit">Export Stock</button>
+        <button type="submit">{% trans %}Export Stock{% endtrans %}</button> <!-- Translated button -->
     </form>
 
     <!-- Back Button -->
     <form action="/" method="GET">
-        <button type="submit">Back to Invoice</button>
+        <button type="submit">{% trans %}Back to Invoice{% endtrans %}</button> <!-- Translated button -->
     </form>
 </body>
 

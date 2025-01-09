@@ -4,42 +4,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Generator</title>
+    <title>{% trans %}Invoice Generator{% endtrans %}</title>  <!-- Corrected -->
     <link rel="stylesheet" href="/static/invoice_generator.css">
 </head>
 
 <body>
 
-    <h1>Invoice Generator</h1>
+    <h1>{% trans %}Invoice Generator{% endtrans %}</h1>
 
-    <!-- Add Item Form -->
-    <form id="add-item-form" ,action="/" method="POST">
-        <label for="product_id">Product Id:</label>
-        <input type="text" id="product_id" name="product_id" required>
-
-        <label for="product_name">Product Name:</label>
-        <input type="text" id="product_name" name="product_name" required>
-
-        <label for="quantity">Quantity:</label>
-        <input type="number" id="quantity" name="quantity" required min="1">
-
-        <label for="price">Price:</label>
-        <input type="number" id="price" name="price" required step="0.01">
-
-        <button type="submit">Add Item</button>
+    <form action="/language/set" method="POST">
+        <select name="language">
+            <option value="en" {% if language == 'en' %}selected{% endif %}>English</option>
+            <option value="bs" {% if language == 'bs' %}selected{% endif %}>Bosanski</option>
+        </select>
+        <button type="submit">{% trans %}Set Language{% endtrans %}</button>
     </form>
 
-    <!-- Current Invoice Items -->
-    <h2>Current Invoice Items</h2>
+    <form id="add-item-form" ,action="/" method="POST">
+        <label for="product_id">{% trans %}Product Id:{% endtrans %}</label>
+        <input type="text" id="product_id" name="product_id" required>
+
+         <label for="product_name">{% trans %}Product Name:{% endtrans %}</label>
+        <input type="text" id="product_name" name="product_name" required>
+
+        <label for="quantity">{% trans %}Quantity:{% endtrans %}</label>
+        <input type="number" id="quantity" name="quantity" required min="1">
+
+        <label for="price">{% trans %}Price:{% endtrans %}</label>
+        <input type="number" id="price" name="price" required step="0.01">
+
+        <button type="submit">{% trans %}Add Item{% endtrans %}</button>
+    </form>
+
+    <!-- ... -->
+
+    <h2>{% trans %}Current Invoice Items{% endtrans %}</h2>
     {% if invoice %}
     <table>
         <tr>
-            <th>Product Id</th>
-            <th>Product Name</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Total</th>
-            <th>Remove</th>
+            <th>{% trans %}Product Id{% endtrans %}</th>
+            <th>{% trans %}Product Name{% endtrans %}</th>
+            <th>{% trans %}Quantity{% endtrans %}</th>
+            <th>{% trans %}Price{% endtrans %}</th>
+            <th>{% trans %}Total{% endtrans %}</th>
+            <th>{% trans %}Remove{% endtrans %}</th>
         </tr>
         {% for item in invoice %}
         <tr>
@@ -50,30 +58,30 @@
             <td>{{ item.total }}</td>
             <td>
                 <form action="/remove/{{ loop.index0 }}" method="POST" style="display:inline;">
-                    <button type="submit">Remove</button>
+                    <button type="submit">{% trans %}Remove{% endtrans %}</button>
                 </form>
             </td>
         </tr>
         {% endfor %}
     </table>
-    <h3>Total Amount: {{ total_amount }}</h3>
+    <h3>{% trans %}Total Amount:{% endtrans %} {{ total_amount }}</h3>
     {% else %}
-    <p>No items added yet.</p>
+    <p>{% trans %}No items added yet.{% endtrans %}</p>
     {% endif %}
 
     <!-- Confirm and Clear Buttons -->
     <form action="/export" method="POST" style="display:inline;">
         <input name="invoice-number" value="{{ invoice_number }}" required>
-        <button type="submit">Confirm and Export Invoice</button>
+        <button type="submit">{% trans %}Confirm and Export Invoice{% endtrans %}</button>
 
     </form>
 
     <form action="/clear" method="POST" style="display:inline;">
-        <button type="submit">Clear Invoice</button>
+        <button type="submit">{% trans %}Clear Invoice{% endtrans %}</button>
     </form>
     <!-- Invoice Manager -->
     <form action="/stock" method="GET">
-        <button type="submit">Go to Invoice Manager</button>
+        <button type="submit">{% trans %}Go to Invoice Manager{% endtrans %}</button>
     </form>
 
 
