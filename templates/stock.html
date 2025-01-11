@@ -11,7 +11,10 @@
 
 <body>
     <h1>{% trans %}Stock Management{% endtrans %}</h1> <!-- Translated heading -->
-
+    <!-- Back Button -->
+    <form action="/" method="GET">
+        <button type="submit">{% trans %}Back to Invoice{% endtrans %}</button> <!-- Translated button -->
+    </form>
     <!-- Add Product Form -->
     <form action="/stock/add" method="POST">
         <h3>{% trans %}Add Product{% endtrans %}</h3> <!-- Translated subheading -->
@@ -71,10 +74,7 @@
         <button type="submit">{% trans %}Export Stock{% endtrans %}</button> <!-- Translated button -->
     </form>
 
-    <!-- Back Button -->
-    <form action="/" method="GET">
-        <button type="submit">{% trans %}Back to Invoice{% endtrans %}</button> <!-- Translated button -->
-    </form>
+
 </body>
 
 </html>

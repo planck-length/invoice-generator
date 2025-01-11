@@ -17,6 +17,15 @@ form {
     margin-bottom: 20px;
 }
 
+form#lang-set {
+    display: grid;
+    justify-content: end;
+}
+form#switch-to-inv-manager {
+    display: grid;
+    justify-content: end;
+}
+
 label {
     margin-bottom: 5px;
     font-weight: bold;

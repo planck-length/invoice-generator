@@ -12,12 +12,17 @@
 
     <h1>{% trans %}Invoice Generator{% endtrans %}</h1>
 
-    <form action="/language/set" method="POST">
+    <form id="lang-set" action="/language/set" method="POST">
         <select name="language">
             <option value="en" {% if language == 'en' %}selected{% endif %}>English</option>
             <option value="bs" {% if language == 'bs' %}selected{% endif %}>Bosanski</option>
         </select>
         <button type="submit">{% trans %}Set Language{% endtrans %}</button>
+    </form>
+
+    <!-- Invoice Manager -->
+    <form id="switch-to-inv-manager" action="/stock" method="GET">
+        <button  type="submit">{% trans %}Go to Invoice Manager{% endtrans %}</button>
     </form>
 
     <form id="add-item-form" ,action="/" method="POST">
@@ -81,10 +86,7 @@
     <form action="/clear" method="POST" style="display:inline;">
         <button type="submit">{% trans %}Clear Invoice{% endtrans %}</button>
     </form>
-    <!-- Invoice Manager -->
-    <form action="/stock" method="GET">
-        <button type="submit">{% trans %}Go to Invoice Manager{% endtrans %}</button>
-    </form>
+
 
 
     <script>
