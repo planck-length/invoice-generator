@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-01-09 22:46+0100\n"
+"POT-Creation-Date: 2025-01-11 12:33+0100\n"
 "PO-Revision-Date: 2025-01-09 22:25+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: bs\n"
@@ -18,6 +18,46 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
+
+#: invoice_generator.py:141
+msgid "Invoice "
+msgstr "Faktura "
+
+#: invoice_generator.py:143
+msgid "Invoice Number: "
+msgstr "Broj Fakture: "
+
+#: invoice_generator.py:145
+msgid "Customer Name: "
+msgstr "Ime Kupca: "
+
+#: invoice_generator.py:149
+msgid "Date and Time: "
+msgstr "Vrijeme i datum: "
+
+#: invoice_generator.py:153 templates/index.html:45 templates/stock.html:34
+msgid "Product Id"
+msgstr "Sifra Proizvoda"
+
+#: invoice_generator.py:154 templates/index.html:46 templates/stock.html:35
+msgid "Product Name"
+msgstr "Naziv Proizvoda"
+
+#: invoice_generator.py:155 templates/index.html:47
+msgid "Quantity"
+msgstr "Kolicina"
+
+#: invoice_generator.py:156 templates/index.html:48 templates/stock.html:36
+msgid "Price"
+msgstr "Cijena"
+
+#: invoice_generator.py:157 templates/index.html:49
+msgid "Total"
+msgstr "Ukupno"
+
+#: invoice_generator.py:173
+msgid "Total:"
+msgstr "Ukupno:"
 
 #: templates/index.html:7 templates/index.html:13
 msgid "Invoice Generator"
@@ -52,26 +92,6 @@ msgstr "Dodaj stavku"
 msgid "Current Invoice Items"
 msgstr "Trenutne stavke fakture"
 
-#: templates/index.html:45 templates/stock.html:34
-msgid "Product Id"
-msgstr "Sifra Proizvoda"
-
-#: templates/index.html:46 templates/stock.html:35
-msgid "Product Name"
-msgstr "Naziv Proizvoda"
-
-#: templates/index.html:47
-msgid "Quantity"
-msgstr "Kolicina"
-
-#: templates/index.html:48 templates/stock.html:36
-msgid "Price"
-msgstr "Cijena"
-
-#: templates/index.html:49
-msgid "Total"
-msgstr "Ukupno"
-
 #: templates/index.html:50 templates/index.html:61
 msgid "Remove"
 msgstr "Obrisi"
@@ -85,14 +105,18 @@ msgid "No items added yet."
 msgstr "Nema dodanih stavki."
 
 #: templates/index.html:75
+msgid "Customer Name:"
+msgstr "Ime Kupca"
+
+#: templates/index.html:77
 msgid "Confirm and Export Invoice"
 msgstr "Potvrdi i exportuj fakturu"
 
-#: templates/index.html:80
+#: templates/index.html:82
 msgid "Clear Invoice"
 msgstr "Ocisti Fakturu"
 
-#: templates/index.html:84
+#: templates/index.html:86
 msgid "Go to Invoice Manager"
 msgstr "Idi na Upravljanje zalihama"
 

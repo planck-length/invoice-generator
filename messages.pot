@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-01-09 22:46+0100\n"
+"POT-Creation-Date: 2025-01-11 12:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,46 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
+
+#: invoice_generator.py:141
+msgid "Invoice "
+msgstr ""
+
+#: invoice_generator.py:143
+msgid "Invoice Number: "
+msgstr ""
+
+#: invoice_generator.py:145
+msgid "Customer Name: "
+msgstr ""
+
+#: invoice_generator.py:149
+msgid "Date and Time: "
+msgstr ""
+
+#: invoice_generator.py:153 templates/index.html:45 templates/stock.html:34
+msgid "Product Id"
+msgstr ""
+
+#: invoice_generator.py:154 templates/index.html:46 templates/stock.html:35
+msgid "Product Name"
+msgstr ""
+
+#: invoice_generator.py:155 templates/index.html:47
+msgid "Quantity"
+msgstr ""
+
+#: invoice_generator.py:156 templates/index.html:48 templates/stock.html:36
+msgid "Price"
+msgstr ""
+
+#: invoice_generator.py:157 templates/index.html:49
+msgid "Total"
+msgstr ""
+
+#: invoice_generator.py:173
+msgid "Total:"
+msgstr ""
 
 #: templates/index.html:7 templates/index.html:13
 msgid "Invoice Generator"
@@ -49,26 +89,6 @@ msgstr ""
 msgid "Current Invoice Items"
 msgstr ""
 
-#: templates/index.html:45 templates/stock.html:34
-msgid "Product Id"
-msgstr ""
-
-#: templates/index.html:46 templates/stock.html:35
-msgid "Product Name"
-msgstr ""
-
-#: templates/index.html:47
-msgid "Quantity"
-msgstr ""
-
-#: templates/index.html:48 templates/stock.html:36
-msgid "Price"
-msgstr ""
-
-#: templates/index.html:49
-msgid "Total"
-msgstr ""
-
 #: templates/index.html:50 templates/index.html:61
 msgid "Remove"
 msgstr ""
@@ -82,14 +102,18 @@ msgid "No items added yet."
 msgstr ""
 
 #: templates/index.html:75
+msgid "Customer Name:"
+msgstr ""
+
+#: templates/index.html:77
 msgid "Confirm and Export Invoice"
 msgstr ""
 
-#: templates/index.html:80
+#: templates/index.html:82
 msgid "Clear Invoice"
 msgstr ""
 
-#: templates/index.html:84
+#: templates/index.html:86
 msgid "Go to Invoice Manager"
 msgstr ""
 

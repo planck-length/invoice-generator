@@ -72,6 +72,8 @@
     <!-- Confirm and Clear Buttons -->
     <form action="/export" method="POST" style="display:inline;">
         <input name="invoice-number" value="{{ invoice_number }}" required>
+        <label for="customer-name">{% trans %}Customer Name:{% endtrans %}</label>
+        <input name="customer-name" value=""  required>
         <button type="submit">{% trans %}Confirm and Export Invoice{% endtrans %}</button>
 
     </form>

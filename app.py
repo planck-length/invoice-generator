@@ -39,7 +39,7 @@ def remove_item(item_index):
 
 @app.route("/export", methods=["POST"])
 def export_pdf():
-    return ig.export_complete_invoice(request)
+    return ig.export_complete_invoice()
 
 
 @app.route("/clear", methods=["POST"])

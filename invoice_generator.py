@@ -1,4 +1,6 @@
+import datetime
 from flask import render_template, request, redirect, url_for, send_file
+from flask_babel import gettext as _
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import sqlite3
@@ -103,10 +105,9 @@ def remove_item(item_index):
     return redirect(url_for("index"))
 
 
-def _update_db_with_current_invoice(
-    invoice_number,
-):
+def _update_db_with_current_invoice(invoice_number, customer_name):
     global current_invoice
+    total_amount = sum(item["total"] for item in current_invoice)
     with sqlite3.connect("database.db", autocommit=False) as conn:
         c = conn.cursor()
         # max invoice number
@@ -115,7 +116,10 @@ def _update_db_with_current_invoice(
         max_invoice_id += 1
 
         # Save the invoice number to the database
-        c.execute("INSERT INTO invoice (invoice_number) VALUES (?)", (invoice_number,))
+        c.execute(
+            "INSERT INTO invoice (invoice_number,customer_name,total_amount) VALUES (?, ?, ?)",
+            (invoice_number, customer_name, float(total_amount)),
+        )
 
         # Save current invoice items to the database
         for item in current_invoice:
@@ -126,7 +130,7 @@ def _update_db_with_current_invoice(
         conn.commit()
 
 
-def _export_pdf(invoice_number):
+def _export_pdf(invoice_number, customer_name):
     global current_invoice
 
     buffer = io.BytesIO()
@@ -134,21 +138,27 @@ def _export_pdf(invoice_number):
 
     # PDF Title and Invoice Number
     c.setFont("Helvetica-Bold", 16)
-    c.drawString(100, 750, "Invoice")
+    c.drawString(100, 750, _("Invoice "))
     c.setFont("Helvetica", 12)
-    c.drawString(400, 750, f"Invoice Number: {invoice_number}")
-
+    c.drawString(400, 750, _("Invoice Number: ") + invoice_number)
+    # Customer Name
+    c.drawString(100, 730, _("Customer Name: ") + customer_name)
+    # Date and Time
+    now = datetime.datetime.now()
+    formatted_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    c.drawString(100, 710, _("Date and Time: ") + formatted_date_time)
     # Header
     c.setFont("Helvetica-Bold", 12)
-    c.drawString(50, 720, "Product Id")
-    c.drawString(150, 720, "Product Name")
-    c.drawString(300, 720, "Quantity")
-    c.drawString(400, 720, "Price")
-    c.drawString(500, 720, "Total")
+    y = 690
+    c.drawString(50, y, _("Product Id"))
+    c.drawString(150, y, _("Product Name"))
+    c.drawString(300, y, _("Quantity"))
+    c.drawString(400, y, _("Price"))
+    c.drawString(500, y, _("Total"))
 
     # Content
     c.setFont("Helvetica", 12)
-    y = 700
+    y = 650
     for item in current_invoice:
         c.drawString(50, y, item["product_id"])
         c.drawString(150, y, item["product_name"])
@@ -160,7 +170,7 @@ def _export_pdf(invoice_number):
     # Total Amount
     total_amount = sum(item["total"] for item in current_invoice)
     c.setFont("Helvetica-Bold", 12)
-    c.drawString(400, y - 20, "Total:")
+    c.drawString(400, y - 20, _("Total:"))
     c.drawString(500, y - 20, f"{total_amount:.2f}")
 
     c.save()
@@ -177,11 +187,12 @@ def _export_pdf(invoice_number):
     )
 
 
-def export_complete_invoice(request):
+def export_complete_invoice():
     global current_invoice
     invoice_number = request.form.get("invoice-number")
-    _update_db_with_current_invoice(invoice_number)
-    return _export_pdf(invoice_number)
+    customer_name = request.form.get("customer-name")
+    _update_db_with_current_invoice(invoice_number, customer_name)
+    return _export_pdf(invoice_number, customer_name)
 
 
 def clear():
