@@ -3,6 +3,10 @@ body {
     max-width: 900px;
     margin: 20px auto;
     padding: 10px;
+    display: grid;
+    justify-content: center;
+    align-content: space-evenly;
+    align-items: center;
 }
 
 h1 {
