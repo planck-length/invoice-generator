@@ -129,7 +129,7 @@ def init_db():
                     INNER JOIN stock st ON st.product_id=p.id
                     LEFT JOIN sales s ON p.id=s.product_id 
                     LEFT JOIN invoice i ON i.id=s.invoice_id
-                    WHERE p.is_current=TRUE
+                    WHERE p.is_current=1
                     GROUP BY p.id
                     ORDER BY p.id"""
         )
