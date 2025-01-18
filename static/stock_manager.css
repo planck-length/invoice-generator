@@ -64,3 +64,15 @@ button {
     max-width: fit-content;
     width: fit-content;
 }
+
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid #ccc;
+    padding: 20px;
+    background-color: white;
+    z-index: 1000; /* Ensure popup is on top */
+}

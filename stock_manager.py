@@ -117,14 +117,15 @@ def init_db():
         )
         c.execute(
             """CREATE VIEW IF NOT EXISTS stock_view AS
-                SELECT p.id, p.name as product_name, 
-                            p.price, st.start_quantity
-                            ,
-                            COALESCE(SUM(s.quantity),0) as sold_quantity,
-                            COALESCE(SUM(s.quantity*p.price),0) as total_amount_sold,
-                            (st.start_quantity-COALESCE(SUM(s.quantity),0)) as current_quantity,
-                            (st.start_quantity-COALESCE(SUM(s.quantity),0))*p.price as total_amount_current,
-                            COALESCE(group_concat(i.id),'') as aggregated_invoices
+                SELECT  p.id, 
+                        p.name as product_name, 
+                        p.price, 
+                        st.start_quantity,
+                        COALESCE(SUM(s.quantity),0) as sold_quantity,
+                        ROUND(COALESCE(SUM(s.quantity*p.price),0),2) as total_amount_sold,
+                        (st.start_quantity-COALESCE(SUM(s.quantity),0)) as current_quantity,
+                        ROUND((st.start_quantity-COALESCE(SUM(s.quantity),0))*p.price,2) as total_amount_current,
+                        COALESCE(group_concat(i.id),'') as aggregated_invoices
                     FROM product p
                     INNER JOIN stock st ON st.product_id=p.id
                     LEFT JOIN sales s ON p.id=s.product_id 

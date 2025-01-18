@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file
-from flask_babel import gettext as _,Babel
+from flask_babel import gettext as _, Babel
 import logging
 import sqlite3
 import invoice_generator as ig
@@ -7,13 +7,12 @@ import stock_manager as sm
 from flask import jsonify  # Import jsonify
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "SECRET_KEY"
 
-
-babel = Babel(app, locale_selector=lambda :app.config.get("LANGUAGE", "bs"))
+babel = Babel(app, locale_selector=lambda: app.config.get("LANGUAGE", "bs"))
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-
 
 
 # set language
@@ -22,6 +21,12 @@ def set_language():
     language = request.form.get("language")
     app.config["LANGUAGE"] = language
     return redirect(request.referrer)
+
+
+@app.route("/add_item", methods=["POST"])
+def add_item_to_invoice():
+    ig.add_item_to_invoice()
+    return redirect(url_for("index"))
 
 
 # Invoice Generator Routes

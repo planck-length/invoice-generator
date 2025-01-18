@@ -1,14 +1,26 @@
 import datetime
 from flask import render_template, request, redirect, url_for, send_file
+from flask_wtf import FlaskForm
 from flask_babel import gettext as _
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import sqlite3
 import io
 
+from wtforms import IntegerField, StringField,FloatField
+from wtforms.validators import DataRequired
+
 
 # Temporary storage for current invoice items
 current_invoice = []
+
+
+# Form for adding a new product
+class ProductForm(FlaskForm):
+    product_id=StringField(_("Product ID"), validators=[DataRequired()])
+    product_name=StringField(_("Product Name"), validators=[DataRequired()])
+    quantity=IntegerField(_("Quantity"), validators=[DataRequired()])
+    price = FloatField(_("Price"), validators=[DataRequired()])
 
 
 # Initialize the database
@@ -54,43 +66,32 @@ def get_next_invoice_number():
         next_invoice_number = f"INV-{(result + 1) if result else 1}"
         return next_invoice_number
 
+def add_item_to_invoice():
+    global current_invoice
+
+    form=ProductForm(meta={'csrf': False})
+    if form.validate_on_submit():
+        # breakpoint()
+        product_id = form.product_id.data
+        product_name = form.product_name.data
+        quantity = form.quantity.data
+        price = form.price.data
+        total = quantity * price
+        current_invoice.append(
+            {
+                "product_id": product_id,
+                "product_name": product_name,
+                "quantity": quantity,
+                "price": price,
+                "total": total,
+            }
+        )
+        return redirect(url_for("index"))
 
 def index():
     global current_invoice
     invoice_number = get_next_invoice_number()
-
-    if request.method == "POST":
-        # Update the invoice number (if provided)
-        if "update_invoice_number" in request.form:
-            invoice_number = request.form.get("invoice_number")
-
-        # Add an item to the current invoice
-        if "quantity" in request.form:
-            product_id = request.form.get("product_id")
-            product_name = request.form.get("product_name")
-            quantity = int(request.form.get("quantity"))
-            price = float(request.form.get("price"))
-            total = quantity * price
-
-            current_invoice.append(
-                {
-                    "product_id": product_id,
-                    "product_name": product_name,
-                    "quantity": quantity,
-                    "price": price,
-                    "total": total,
-                }
-            )
-
     total_amount = sum(item["total"] for item in current_invoice)
-
-    # return render_template(
-    #     "index.html",
-    #     invoice=current_invoice,
-    #     total_amount=total_amount,
-    #     invoice_number=invoice_number,
-    #     language=app.config["LANGUAGE"],
-    # )
     return {
         "invoice": current_invoice,
         "total_amount": total_amount,
@@ -176,8 +177,7 @@ def _export_pdf(invoice_number, customer_name):
     c.save()
     buffer.seek(0)
 
-    # Clear the current invoice after export
-    current_invoice = []
+
 
     return send_file(
         buffer,
@@ -192,7 +192,10 @@ def export_complete_invoice():
     invoice_number = request.form.get("invoice-number")
     customer_name = request.form.get("customer-name")
     _update_db_with_current_invoice(invoice_number, customer_name)
-    return _export_pdf(invoice_number, customer_name)
+    resp=_export_pdf(invoice_number, customer_name)
+    # Clear the current invoice after export
+    current_invoice = []
+    return resp
 
 
 def clear():

@@ -4,39 +4,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% trans %}Stock Management{% endtrans %}</title> <!-- Translated title -->
+    <title>{% trans %}Stock Management{% endtrans %}</title>
     <link rel="stylesheet" href="/static/stock_manager.css">
-
 </head>
 
-
 <body>
-    <h1>{% trans %}Stock Management{% endtrans %}</h1> <!-- Translated heading -->
-    <!-- Back Button -->
+    <h1>{% trans %}Stock Management{% endtrans %}</h1>
     <form action="/" method="GET">
-        <button type="submit">{% trans %}Back to Invoice{% endtrans %}</button> <!-- Translated button -->
+        <button type="submit">{% trans %}Back to Invoice{% endtrans %}</button>
     </form>
-    <!-- Add Product Form -->
     <form action="/stock/add" method="POST">
-        <h3>{% trans %}Add Product{% endtrans %}</h3> <!-- Translated subheading -->
-        <label for="product_name">{% trans %}Product Name:{% endtrans %}</label> <!-- Translated label -->
+        <h3>{% trans %}Add Product{% endtrans %}</h3>
+        <label for="product_name">{% trans %}Product Name:{% endtrans %}</label>
         <input type="text" id="product_name" name="product_name" required>
 
-        <label for="price">{% trans %}Price:{% endtrans %}</label> <!-- Translated label -->
+        <label for="price">{% trans %}Price:{% endtrans %}</label>
         <input type="number" id="price" name="price" step="0.01" required>
 
-        <label for="start_quantity">{% trans %}Start Quantity:{% endtrans %}</label> <!-- Translated label -->
+        <label for="start_quantity">{% trans %}Start Quantity:{% endtrans %}</label>
         <input type="number" id="start_quantity" name="start_quantity" required min="1">
 
-        <button type="submit">{% trans %}Add Product{% endtrans %}</button> <!-- Translated button -->
+        <button type="submit">{% trans %}Add Product{% endtrans %}</button>
     </form>
 
-    <!-- Stock Table -->
     <div class="table-container">
-        <h3>{% trans %}Current Stock{% endtrans %}</h3> <!-- Translated subheading -->
-        <table >
-            <tr >
-                <th>{% trans %}Product Id{% endtrans %}</th> <!-- Translated table headers -->
+        <h3>{% trans %}Current Stock{% endtrans %}</h3>
+        <table>
+            <tr>
+                <th>{% trans %}Product Id{% endtrans %}</th>
                 <th>{% trans %}Product Name{% endtrans %}</th>
                 <th>{% trans %}Price{% endtrans %}</th>
                 <th>{% trans %}Start Quantity{% endtrans %}</th>
@@ -45,7 +40,7 @@
                 <th>{% trans %}Current Quantity{% endtrans %}</th>
                 <th>{% trans %}Total Amount Current{% endtrans %}</th>
                 <th>{% trans %}Invoices{% endtrans %}</th>
-                <th>{% trans %}Update Current Quantity{% endtrans %}</th>
+                <th>{% trans %}Update{% endtrans %}</th>
             </tr>
             {% for product in products %}
             <tr>
@@ -59,24 +54,65 @@
                 <td>{{ product[7] }}</td>
                 <td>{{ product[8] }}</td>
                 <td>
-                    <form action="/stock/update/{{ product[0] }}" method="POST" style="display:inline;">
-                        <label for="price">{% trans %}Price:{% endtrans %}</label> <!-- Translated label -->
-                        <input type="number" name="price" step="0.01" value="{{ product[2] }}" required>
-                        <label for="start_quantity">{% trans %}Start Quantity:{% endtrans %}</label>
-                        <!-- Translated label -->
-                        <input type="number" name="start_quantity" value="{{ product[3] }}" required>
-                        <button type="submit">{% trans %}Update{% endtrans %}</button> <!-- Translated button -->
-                    </form>
+                    <button class="update-btn" data-product-id="{{ product[0] }}" 
+                        data-product-name="{{ product[1] }}" data-price="{{ product[2] }}"
+                        data-start-quantity="{{ product[3] }}">{% trans %}Update{% endtrans %}</button>
                 </td>
             </tr>
             {% endfor %}
         </table>
     </div>
-    <!-- Export Button -->
+
+    <div id="updatePopup" class="popup">
+        <form id="updateForm" method="POST">
+            <h3>{% trans %}Update Product{% endtrans %}</h3>
+            <input type="hidden" name="product_id" id="productId">
+            <label for="productName">{% trans %}Product Name:{% endtrans %}</label>
+            <input type="text" id="productName" name="product_name" required><br><br>
+
+            <label for="productPrice">{% trans %}Price:{% endtrans %}</label>
+            <input type="number" id="productPrice" name="price" step="0.01" required><br><br>
+
+            <label for="productStartQuantity">{% trans %}Start Quantity:{% endtrans %}</label>
+            <input type="number" id="productStartQuantity" name="start_quantity" required><br><br>
+            
+            <button type="submit">{% trans %}Update{% endtrans %}</button>
+            <button type="button" id="closePopup">{% trans %}Close{% endtrans %}</button>
+        </form>
+    </div>
+
     <form action="/stock/export" method="GET">
-        <button type="submit">{% trans %}Export Stock{% endtrans %}</button> <!-- Translated button -->
+        <button type="submit">{% trans %}Export Stock{% endtrans %}</button>
     </form>
 
+    <script>
+        const updateButtons = document.querySelectorAll('.update-btn');
+        const popup = document.getElementById('updatePopup');
+        const closePopupButton = document.getElementById('closePopup');
+        const updateForm = document.getElementById('updateForm');
+        const productIdInput = document.getElementById('productId');
+        const productNameInput = document.getElementById('productName');
+        const productPriceInput = document.getElementById('productPrice');
+        const productStartQuantityInput = document.getElementById('productStartQuantity');
+
+
+        updateButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                productIdInput.value = button.dataset.productId;
+                productNameInput.value = button.dataset.productName;
+                productPriceInput.value = button.dataset.price;
+                productStartQuantityInput.value = button.dataset.startQuantity;
+
+                updateForm.action = `/stock/update/${button.dataset.productId}`;
+                popup.style.display = 'block';
+            });
+        });
+
+        closePopupButton.addEventListener('click', () => {
+            popup.style.display = 'none';
+        });
+
+    </script>
 
 </body>
 
