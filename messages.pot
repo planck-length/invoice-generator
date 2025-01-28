@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-01-11 12:33+0100\n"
+"POT-Creation-Date: 2025-01-28 22:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,43 +17,49 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
 
-#: invoice_generator.py:141
-msgid "Invoice "
+#: invoice_generator.py:20
+msgid "Product ID"
 msgstr ""
 
-#: invoice_generator.py:143
-msgid "Invoice Number: "
-msgstr ""
-
-#: invoice_generator.py:145
-msgid "Customer Name: "
-msgstr ""
-
-#: invoice_generator.py:149
-msgid "Date and Time: "
-msgstr ""
-
-#: invoice_generator.py:153 templates/index.html:45 templates/stock.html:34
-msgid "Product Id"
-msgstr ""
-
-#: invoice_generator.py:154 templates/index.html:46 templates/stock.html:35
+#: invoice_generator.py:21 invoice_generator.py:155 templates/index.html:51
+#: templates/stock.html:36
 msgid "Product Name"
 msgstr ""
 
-#: invoice_generator.py:155 templates/index.html:47
+#: invoice_generator.py:22 invoice_generator.py:156 templates/index.html:52
 msgid "Quantity"
 msgstr ""
 
-#: invoice_generator.py:156 templates/index.html:48 templates/stock.html:36
+#: invoice_generator.py:23 invoice_generator.py:157 templates/index.html:53
+#: templates/stock.html:37
 msgid "Price"
 msgstr ""
 
-#: invoice_generator.py:157 templates/index.html:49
+#: invoice_generator.py:142
+msgid "Invoice "
+msgstr ""
+
+#: invoice_generator.py:144
+msgid "Invoice Number: "
+msgstr ""
+
+#: invoice_generator.py:146
+msgid "Customer Name: "
+msgstr ""
+
+#: invoice_generator.py:150
+msgid "Date and Time: "
+msgstr ""
+
+#: invoice_generator.py:154 templates/index.html:50 templates/stock.html:35
+msgid "Product Id"
+msgstr ""
+
+#: invoice_generator.py:158 templates/index.html:54
 msgid "Total"
 msgstr ""
 
-#: invoice_generator.py:173
+#: invoice_generator.py:174
 msgid "Total:"
 msgstr ""
 
@@ -65,67 +71,71 @@ msgstr ""
 msgid "Set Language"
 msgstr ""
 
-#: templates/index.html:24
-msgid "Product Id:"
-msgstr ""
-
-#: templates/index.html:27 templates/stock.html:18
-msgid "Product Name:"
-msgstr ""
-
-#: templates/index.html:30
-msgid "Quantity:"
-msgstr ""
-
-#: templates/index.html:33 templates/stock.html:21 templates/stock.html:58
-msgid "Price:"
-msgstr ""
-
-#: templates/index.html:36
-msgid "Add Item"
-msgstr ""
-
-#: templates/index.html:41
-msgid "Current Invoice Items"
-msgstr ""
-
-#: templates/index.html:50 templates/index.html:61
-msgid "Remove"
-msgstr ""
-
-#: templates/index.html:67
-msgid "Total Amount:"
-msgstr ""
-
-#: templates/index.html:69
-msgid "No items added yet."
-msgstr ""
-
-#: templates/index.html:75
-msgid "Customer Name:"
-msgstr ""
-
-#: templates/index.html:77
-msgid "Confirm and Export Invoice"
-msgstr ""
-
-#: templates/index.html:82
-msgid "Clear Invoice"
-msgstr ""
-
-#: templates/index.html:86
+#: templates/index.html:25
 msgid "Go to Invoice Manager"
 msgstr ""
 
-#: templates/stock.html:7 templates/stock.html:13
+#: templates/index.html:29
+msgid "Product Id:"
+msgstr ""
+
+#: templates/index.html:32 templates/stock.html:18 templates/stock.html:83
+msgid "Product Name:"
+msgstr ""
+
+#: templates/index.html:35
+msgid "Quantity:"
+msgstr ""
+
+#: templates/index.html:38 templates/stock.html:21 templates/stock.html:86
+msgid "Price:"
+msgstr ""
+
+#: templates/index.html:41
+msgid "Add Item"
+msgstr ""
+
+#: templates/index.html:46
+msgid "Current Invoice Items"
+msgstr ""
+
+#: templates/index.html:55 templates/index.html:66
+msgid "Remove"
+msgstr ""
+
+#: templates/index.html:72
+msgid "Total Amount:"
+msgstr ""
+
+#: templates/index.html:74
+msgid "No items added yet."
+msgstr ""
+
+#: templates/index.html:80
+msgid "Customer Name:"
+msgstr ""
+
+#: templates/index.html:82
+msgid "Confirm and Export Invoice"
+msgstr ""
+
+#: templates/index.html:87
+msgid "Clear Invoice"
+msgstr ""
+
+#: templates/stock.html:7 templates/stock.html:12
 msgid "Stock Management"
+msgstr ""
+
+#: templates/stock.html:14
+msgid "Back to Invoice"
 msgstr ""
 
 #: templates/stock.html:17 templates/stock.html:27
 msgid "Add Product"
 msgstr ""
 
-#: templates/stock.html:24 templates/stock.html:60
+#: templates/stock.html:24 templates/stock.html:89
 msgid "Start Quantity:"
 msgstr ""
 
@@ -133,43 +143,47 @@ msgstr ""
 msgid "Current Stock"
 msgstr ""
 
-#: templates/stock.html:37
+#: templates/stock.html:38
 msgid "Start Quantity"
 msgstr ""
 
-#: templates/stock.html:38
+#: templates/stock.html:39
 msgid "Sold Quantity"
 msgstr ""
 
-#: templates/stock.html:39
+#: templates/stock.html:40
 msgid "Total Amount Sold"
 msgstr ""
 
-#: templates/stock.html:40
+#: templates/stock.html:41
 msgid "Current Quantity"
 msgstr ""
 
-#: templates/stock.html:41
+#: templates/stock.html:42
 msgid "Total Amount Current"
 msgstr ""
 
-#: templates/stock.html:42
+#: templates/stock.html:43
 msgid "Invoices"
 msgstr ""
 
-#: templates/stock.html:43
-msgid "Update Current Quantity"
-msgstr ""
-
-#: templates/stock.html:62
+#: templates/stock.html:44 templates/stock.html:61 templates/stock.html:92
 msgid "Update"
 msgstr ""
 
-#: templates/stock.html:71
-msgid "Export Stock"
+#: templates/stock.html:68
+msgid "Totals:"
 msgstr ""
 
-#: templates/stock.html:76
-msgid "Back to Invoice"
+#: templates/stock.html:81
+msgid "Update Product"
+msgstr ""
+
+#: templates/stock.html:93
+msgid "Close"
+msgstr ""
+
+#: templates/stock.html:98
+msgid "Export Stock"
 msgstr ""
 

@@ -30,36 +30,49 @@
     <div class="table-container">
         <h3>{% trans %}Current Stock{% endtrans %}</h3>
         <table>
-            <tr>
-                <th>{% trans %}Product Id{% endtrans %}</th>
-                <th>{% trans %}Product Name{% endtrans %}</th>
-                <th>{% trans %}Price{% endtrans %}</th>
-                <th>{% trans %}Start Quantity{% endtrans %}</th>
-                <th>{% trans %}Sold Quantity{% endtrans %}</th>
-                <th>{% trans %}Total Amount Sold{% endtrans %}</th>
-                <th>{% trans %}Current Quantity{% endtrans %}</th>
-                <th>{% trans %}Total Amount Current{% endtrans %}</th>
-                <th>{% trans %}Invoices{% endtrans %}</th>
-                <th>{% trans %}Update{% endtrans %}</th>
-            </tr>
-            {% for product in products %}
-            <tr>
-                <td>{{ product[0] }}</td>
-                <td>{{ product[1] }}</td>
-                <td>{{ product[2] }}</td>
-                <td>{{ product[3] }}</td>
-                <td>{{ product[4] }}</td>
-                <td>{{ product[5] }}</td>
-                <td>{{ product[6] }}</td>
-                <td>{{ product[7] }}</td>
-                <td>{{ product[8] }}</td>
-                <td>
-                    <button class="update-btn" data-product-id="{{ product[0] }}" 
-                        data-product-name="{{ product[1] }}" data-price="{{ product[2] }}"
-                        data-start-quantity="{{ product[3] }}">{% trans %}Update{% endtrans %}</button>
-                </td>
-            </tr>
-            {% endfor %}
+            <thead>
+                <tr>
+                    <th>{% trans %}Product Id{% endtrans %}</th>
+                    <th>{% trans %}Product Name{% endtrans %}</th>
+                    <th>{% trans %}Price{% endtrans %}</th>
+                    <th>{% trans %}Start Quantity{% endtrans %}</th>
+                    <th>{% trans %}Sold Quantity{% endtrans %}</th>
+                    <th>{% trans %}Total Amount Sold{% endtrans %}</th>
+                    <th>{% trans %}Current Quantity{% endtrans %}</th>
+                    <th>{% trans %}Total Amount Current{% endtrans %}</th>
+                    <th>{% trans %}Invoices{% endtrans %}</th>
+                    <th>{% trans %}Update{% endtrans %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product[0] }}</td>
+                    <td>{{ product[1] }}</td>
+                    <td>{{ product[2] }}</td>
+                    <td>{{ product[3] }}</td>
+                    <td>{{ product[4] }}</td>
+                    <td>{{ product[5] }}</td>
+                    <td>{{ product[6] }}</td>
+                    <td>{{ product[7] }}</td>
+                    <td>{{ product[8] }}</td>
+                    <td>
+                        <button class="update-btn" data-product-id="{{ product[0] }}" data-product-name="{{ product[1] }}"
+                            data-price="{{ product[2] }}" data-start-quantity="{{ product[3] }}">{% trans %}Update{% endtrans %}</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4">{% trans %}Totals:{% endtrans %}</td>
+                    <td>{{ total_quantity_sold }}</td>  <!-- Total Sold Amount -->
+                    <td>{{ total_amount_sold }}</td> <!-- Total Current Quantity -->
+                    <td>{{ total_quantity_current }}</td> <!-- Total Current Amount -->
+                    <td>{{ total_amount_current }}</td> <!-- Total Current Amount -->
+                    <td colspan="2"></td>
+                </tr>
+            </tfoot>
         </table>
     </div>
 

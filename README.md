@@ -52,6 +52,3 @@ This Python-based invoice manager provides a basic web interface for creating in
 * **User Authentication:**  Implement user authentication to restrict access to the application.
 * **Enhanced Reporting:** More comprehensive reports for sales and stock data.
 * **Testing:** Add unit tests to ensure code quality and prevent regressions.
-
-
-

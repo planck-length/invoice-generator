@@ -11,8 +11,29 @@ def stock_management():
         c.execute("""SELECT * FROM stock_view""")
 
         products = c.fetchall()
+        (
+            total_quantity_sold,
+            total_amount_sold,
+            total_quantity_current,
+            total_amount_current,
+        ) = c.execute(
+            """SELECT SUM(sold_quantity) total_quantity_sold,
+                        SUM(total_amount_sold) total_amount_sold,
+                        SUM(current_quantity) total_quantity_current,
+                        SUM(total_amount_current) total_amount_current 
+                  FROM stock_view"""
+        ).fetchall()[
+            0
+        ]
 
-    return render_template("stock.html", products=products)
+    return render_template(
+        "stock.html",
+        products=products,
+        total_quantity_sold=total_quantity_sold,
+        total_amount_sold=total_amount_sold,
+        total_quantity_current=total_quantity_current,
+        total_amount_current=total_amount_current,
+    )
 
 
 def add_stock_item():
@@ -25,7 +46,9 @@ def add_stock_item():
         c = conn.cursor()
         max_id = c.execute("SELECT COALESCE(MAX(id),0) FROM product").fetchone()[0]
         product_id = max_id + 1
-        c.execute("INSERT INTO product (name,price) VALUES (?, ?)", (product_name, price))
+        c.execute(
+            "INSERT INTO product (name,price) VALUES (?, ?)", (product_name, price)
+        )
         c.execute(
             "INSERT INTO stock (product_id, product_name, start_quantity) VALUES (?, ?, ?)",
             (product_id, product_name, start_quantity),
@@ -53,6 +76,7 @@ def update_stock_item(product_id):
         conn.commit()
 
     return redirect(url_for("stock_management"))
+
 
 def delete_stock_item(product_id):
     with sqlite3.connect(DATABASE_NAME) as conn:
