@@ -137,48 +137,78 @@ def _export_pdf(invoice_number, customer_name):
 
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
+    
+    # Page dimensions
+    page_height = 750
+    bottom_margin = 50
+    line_height = 20
+    header_height = 100
+    items_per_page = int((page_height - header_height - bottom_margin) / line_height)
+    
+    page_num = 1
+    total_pages = (len(current_invoice) + items_per_page - 1) // items_per_page if current_invoice else 1
+    
+    def draw_header():
+        """Draw the header on each page"""
+        c.setFont("Helvetica-Bold", 16)
+        c.drawString(100, 750, _("Invoice "))
+        c.setFont("Helvetica", 12)
+        c.drawString(400, 750, _("Invoice Number: ") + invoice_number)
+        # Customer Name
+        c.drawString(100, 730, _("Customer Name: ") + customer_name)
+        # Date and Time
+        now = datetime.datetime.now()
+        formatted_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        c.drawString(100, 710, _("Date and Time: ") + formatted_date_time)
+        # Page number
+        c.drawString(500, 710, f"Page {page_num} of {total_pages}")
+        # Header row
+        c.setFont("Helvetica-Bold", 12)
+        y = 690
+        c.drawString(50, y, _("Product Id"))
+        c.drawString(150, y, _("Product Name"))
+        c.drawString(300, y, _("Quantity"))
+        c.drawString(400, y, _("Price"))
+        c.drawString(500, y, _("Total"))
+        return 650  # Return starting y position for items
 
-    # PDF Title and Invoice Number
-    c.setFont("Helvetica-Bold", 16)
-    c.drawString(100, 750, _("Invoice "))
-    c.setFont("Helvetica", 12)
-    c.drawString(400, 750, _("Invoice Number: ") + invoice_number)
-    # Customer Name
-    c.drawString(100, 730, _("Customer Name: ") + customer_name)
-    # Date and Time
-    now = datetime.datetime.now()
-    formatted_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
-    c.drawString(100, 710, _("Date and Time: ") + formatted_date_time)
-    # Header
-    c.setFont("Helvetica-Bold", 12)
-    y = 690
-    c.drawString(50, y, _("Product Id"))
-    c.drawString(150, y, _("Product Name"))
-    c.drawString(300, y, _("Quantity"))
-    c.drawString(400, y, _("Price"))
-    c.drawString(500, y, _("Total"))
-
+    # Draw first page header
+    y = draw_header()
+    
     # Content
     c.setFont("Helvetica", 12)
-    y = 650
+    item_count = 0
+    
     for item in current_invoice:
-        c.drawString(50, y, item["product_id"])
+        # Check if we need a new page
+        if y < bottom_margin + line_height:
+            c.showPage()
+            page_num += 1
+            y = draw_header()
+        
+        c.drawString(50, y, str(item["product_id"]))
         c.drawString(150, y, item["product_name"])
         c.drawString(300, y, str(item["quantity"]))
         c.drawString(400, y, f"{item['price']:.2f}")
         c.drawString(500, y, f"{item['total']:.2f}")
-        y -= 20
+        y -= line_height
+        item_count += 1
 
-    # Total Amount
+    # Total Amount on last page
     total_amount = sum(item["total"] for item in current_invoice)
     c.setFont("Helvetica-Bold", 12)
+    # Ensure we have space for the total
+    if y < bottom_margin + 40:
+        c.showPage()
+        page_num += 1
+        y = draw_header()
+        y -= line_height  # Add some space
+    
     c.drawString(400, y - 20, _("Total:"))
     c.drawString(500, y - 20, f"{total_amount:.2f}")
 
     c.save()
     buffer.seek(0)
-
-
 
     return send_file(
         buffer,
