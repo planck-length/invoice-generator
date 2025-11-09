@@ -42,6 +42,7 @@
                     <th>{% trans %}Total Amount Current{% endtrans %}</th>
                     <th>{% trans %}Invoices{% endtrans %}</th>
                     <th>{% trans %}Update{% endtrans %}</th>
+                    <th>{% trans %}Delete{% endtrans %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -60,6 +61,9 @@
                         <button class="update-btn" data-product-id="{{ product[0] }}" data-product-name="{{ product[1] }}"
                             data-price="{{ product[2] }}" data-start-quantity="{{ product[3] }}">{% trans %}Update{% endtrans %}</button>
                     </td>
+                    <td>
+                        <button type="button" class="delete-btn" data-product-id="{{ product[0] }}" data-product-name="{{ product[1] }}">{% trans %}Delete{% endtrans %}</button>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -70,7 +74,7 @@
                     <td>{{ total_amount_sold }}</td> <!-- Total Current Quantity -->
                     <td>{{ total_quantity_current }}</td> <!-- Total Current Amount -->
                     <td>{{ total_amount_current }}</td> <!-- Total Current Amount -->
-                    <td colspan="2"></td>
+                    <td colspan="3"></td>
                 </tr>
             </tfoot>
         </table>
@@ -92,6 +96,17 @@
             <button type="submit">{% trans %}Update{% endtrans %}</button>
             <button type="button" id="closePopup">{% trans %}Close{% endtrans %}</button>
         </form>
+    </div>
+
+    <div id="deletePopup" class="popup">
+        <div>
+            <h3>{% trans %}Confirm Delete{% endtrans %}</h3>
+            <p id="deleteMessage"></p>
+            <form id="deleteForm" method="POST">
+                <button type="submit" class="delete-btn">{% trans %}Yes, Delete{% endtrans %}</button>
+                <button type="button" id="cancelDelete">{% trans %}Cancel{% endtrans %}</button>
+            </form>
+        </div>
     </div>
 
     <form action="/stock/export" method="GET">
@@ -123,6 +138,27 @@
 
         closePopupButton.addEventListener('click', () => {
             popup.style.display = 'none';
+        });
+
+        // Handle delete button clicks with confirmation modal
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        const deletePopup = document.getElementById('deletePopup');
+        const deleteForm = document.getElementById('deleteForm');
+        const deleteMessage = document.getElementById('deleteMessage');
+        const cancelDeleteButton = document.getElementById('cancelDelete');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.dataset.productId;
+                const productName = button.dataset.productName;
+                deleteMessage.textContent = `Are you sure you want to delete "${productName}"? This action cannot be undone.`;
+                deleteForm.action = `/stock/delete/${productId}`;
+                deletePopup.style.display = 'block';
+            });
+        });
+
+        cancelDeleteButton.addEventListener('click', () => {
+            deletePopup.style.display = 'none';
         });
 
     </script>
