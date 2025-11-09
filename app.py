@@ -106,27 +106,30 @@ def product_details():
 
 @app.route("/autocomplete", methods=["GET"])
 def autocomplete():
-    print("something")
-    product_id = request.args.get("product_id")  # Get the query string
-    product_name = request.args.get("product_name")  # Get the query string
-    if not (product_id or product_name):
-        return jsonify([])  # Return empty list if no query
+    query = request.args.get("query", "").strip()
+    if not query:
+        return jsonify([])
 
     from constants import DATABASE_NAME
     with sqlite3.connect(DATABASE_NAME) as conn:
         c = conn.cursor()
-        conn.set_trace_callback(print)
-        # Use stock_view which has price from product table
-        product_name_pattern = f"%{product_name}%" if product_name else "%%"
-        product_id_int = int(product_id) if product_id and product_id.isdigit() else 0
-        c.execute(
-            "SELECT id, product_name, price FROM stock_view WHERE product_name LIKE ? OR id = ? LIMIT 10",
-            (product_name_pattern, product_id_int),  # Use wildcard for partial matching
-        )
-        logger.debug(f"Query: {product_id}, {product_name}")  # Log the query
-        results = [row[0] for row in c.fetchall()]
+        # Search by both ID and name
+        product_name_pattern = f"%{query}%"
+        product_id = int(query) if query.isdigit() else 0
+        c.execute("""
+            SELECT id, product_name, price 
+            FROM stock_view 
+            WHERE product_name LIKE ? OR id = ?
+            LIMIT 10
+        """, (product_name_pattern, product_id))
+        
+        results = [{
+            'id': row[0],
+            'product_name': row[1],
+            'price': row[2]
+        } for row in c.fetchall()]
 
-    return jsonify(results)  # Return results as JSON
+    return jsonify(results)
 
 
 if __name__ == "__main__":
