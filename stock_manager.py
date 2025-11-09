@@ -83,11 +83,11 @@ def delete_stock_item(product_id):
         c = conn.cursor()
         c.execute(
             "DELETE FROM product WHERE id = ?",
-            (product_id),
+            (product_id,),
         )
         c.execute(
             "DELETE FROM stock WHERE product_id = ?",
-            (product_id),
+            (product_id,),
         )
         conn.commit()
 
@@ -99,11 +99,11 @@ def export_stock():
         c = conn.cursor()
         c.execute(
             """SELECT product_name, price, start_quantity, 
-                    (start_quantity - sold_quantity) AS current_quantity, 
+                    current_quantity, 
                     sold_quantity, 
-                    (sold_quantity * price) AS total_amount_sold, 
-                    ((start_quantity - sold_quantity) * price) AS total_amount_current 
-                    FROM stock"""
+                    total_amount_sold, 
+                    total_amount_current 
+                    FROM stock_view"""
         )
         products = c.fetchall()
 

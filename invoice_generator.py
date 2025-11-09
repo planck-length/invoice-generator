@@ -1,5 +1,5 @@
 import datetime
-from flask import render_template, request, redirect, url_for, send_file
+from flask import render_template, request, redirect, url_for, send_file, session
 from flask_wtf import FlaskForm
 from flask_babel import gettext as _
 from reportlab.lib.pagesizes import letter
@@ -9,10 +9,7 @@ import io
 
 from wtforms import IntegerField, StringField,FloatField
 from wtforms.validators import DataRequired
-
-
-# Temporary storage for current invoice items
-current_invoice = []
+from constants import DATABASE_NAME
 
 
 # Form for adding a new product
@@ -25,7 +22,7 @@ class ProductForm(FlaskForm):
 
 # Initialize the database
 def init_db():
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DATABASE_NAME) as conn:
         c = conn.cursor()
         c.execute(
             """CREATE TABLE IF NOT EXISTS sales (
@@ -59,7 +56,7 @@ def init_db():
 
 # Get the next invoice number
 def get_next_invoice_number():
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DATABASE_NAME) as conn:
         c = conn.cursor()
         c.execute("SELECT MAX(id) FROM invoice")
         result = c.fetchone()[0]
@@ -67,7 +64,8 @@ def get_next_invoice_number():
         return next_invoice_number
 
 def add_item_to_invoice():
-    global current_invoice
+    if 'current_invoice' not in session:
+        session['current_invoice'] = []
 
     form=ProductForm(meta={'csrf': False})
     if form.validate_on_submit():
@@ -77,7 +75,7 @@ def add_item_to_invoice():
         quantity = form.quantity.data
         price = form.price.data
         total = quantity * price
-        current_invoice.append(
+        session['current_invoice'].append(
             {
                 "product_id": product_id,
                 "product_name": product_name,
@@ -86,10 +84,11 @@ def add_item_to_invoice():
                 "total": total,
             }
         )
+        session.modified = True
         return redirect(url_for("index"))
 
 def index():
-    global current_invoice
+    current_invoice = session.get('current_invoice', [])
     invoice_number = get_next_invoice_number()
     total_amount = sum(item["total"] for item in current_invoice)
     return {
@@ -100,16 +99,18 @@ def index():
 
 
 def remove_item(item_index):
-    global current_invoice
+    current_invoice = session.get('current_invoice', [])
     if 0 <= item_index < len(current_invoice):
         del current_invoice[item_index]
+        session['current_invoice'] = current_invoice
+        session.modified = True
     return redirect(url_for("index"))
 
 
 def _update_db_with_current_invoice(invoice_number, customer_name):
-    global current_invoice
+    current_invoice = session.get('current_invoice', [])
     total_amount = sum(item["total"] for item in current_invoice)
-    with sqlite3.connect("database.db", autocommit=False) as conn:
+    with sqlite3.connect(DATABASE_NAME, autocommit=False) as conn:
         c = conn.cursor()
         # max invoice number
         c.execute("SELECT MAX(id) FROM invoice")
@@ -132,7 +133,7 @@ def _update_db_with_current_invoice(invoice_number, customer_name):
 
 
 def _export_pdf(invoice_number, customer_name):
-    global current_invoice
+    current_invoice = session.get('current_invoice', [])
 
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
@@ -188,17 +189,17 @@ def _export_pdf(invoice_number, customer_name):
 
 
 def export_complete_invoice():
-    global current_invoice
     invoice_number = request.form.get("invoice-number")
     customer_name = request.form.get("customer-name")
     _update_db_with_current_invoice(invoice_number, customer_name)
     resp=_export_pdf(invoice_number, customer_name)
     # Clear the current invoice after export
-    current_invoice = []
+    session['current_invoice'] = []
+    session.modified = True
     return resp
 
 
 def clear():
-    global current_invoice
-    current_invoice = []
+    session['current_invoice'] = []
+    session.modified = True
     return redirect(url_for("index"))

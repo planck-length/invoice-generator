@@ -2,12 +2,13 @@ from flask import Flask, render_template, request, redirect, url_for, send_file
 from flask_babel import gettext as _, Babel
 import logging
 import sqlite3
+import os
 import invoice_generator as ig
 import stock_manager as sm
 from flask import jsonify  # Import jsonify
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "SECRET_KEY"
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
 
 babel = Babel(app, locale_selector=lambda: app.config.get("LANGUAGE", "bs"))
 
@@ -49,9 +50,7 @@ def export_pdf():
 
 @app.route("/clear", methods=["POST"])
 def clear():
-    global current_invoice
-    current_invoice = []
-    return redirect(url_for("index"))
+    return ig.clear()
 
 
 # Stock Management Routes
@@ -87,7 +86,8 @@ def product_details():
         return jsonify({})  # Return empty object if no ID provided
 
     try:
-        with sqlite3.connect("database.db") as conn:
+        from constants import DATABASE_NAME
+        with sqlite3.connect(DATABASE_NAME) as conn:
             conn.set_trace_callback(print)
             c = conn.cursor()
             c.execute(
@@ -112,15 +112,16 @@ def autocomplete():
     if not (product_id or product_name):
         return jsonify([])  # Return empty list if no query
 
-    with sqlite3.connect("database.db") as conn:
+    from constants import DATABASE_NAME
+    with sqlite3.connect(DATABASE_NAME) as conn:
         c = conn.cursor()
         conn.set_trace_callback(print)
+        # Use stock_view which has price from product table
+        product_name_pattern = f"%{product_name}%" if product_name else "%%"
+        product_id_int = int(product_id) if product_id and product_id.isdigit() else 0
         c.execute(
-            "SELECT id,product_name,price FROM stock WHERE product_name LIKE ? OR id = ? LIMIT 10",
-            (
-                f"%{product_name}%",
-                f"{product_id}",
-            ),  # Use wildcard for partial matching
+            "SELECT id, product_name, price FROM stock_view WHERE product_name LIKE ? OR id = ? LIMIT 10",
+            (product_name_pattern, product_id_int),  # Use wildcard for partial matching
         )
         logger.debug(f"Query: {product_id}, {product_name}")  # Log the query
         results = [row[0] for row in c.fetchall()]
