@@ -59,6 +59,13 @@ def stock_management():
     return sm.stock_management()
 
 
+@app.route("/stock/search", methods=["GET"])
+def stock_search():
+    query = request.args.get("query", "").strip()
+    results = sm.search_stock(query)
+    return jsonify(results)
+
+
 @app.route("/stock/add", methods=["POST"])
 def add_stock_item():
     return sm.add_stock_item()

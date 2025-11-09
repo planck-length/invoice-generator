@@ -29,6 +29,8 @@
 
     <div class="table-container">
         <h3>{% trans %}Current Stock{% endtrans %}</h3>
+        <label for="stock-search">{% trans %}Search products:{% endtrans %}</label>
+        <input type="text" id="stock-search" placeholder="Type product name or id to search">
         <table>
             <thead>
                 <tr>
@@ -161,6 +163,82 @@
             deletePopup.style.display = 'none';
         });
 
+        // Stock search
+        const stockSearchInput = document.getElementById('stock-search');
+        const tbody = document.querySelector('.table-container table tbody');
+
+        function renderProducts(products){
+            tbody.innerHTML = '';
+            products.forEach(product => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${product.id}</td>
+                    <td>${product.product_name}</td>
+                    <td>${product.price}</td>
+                    <td>${product.start_quantity}</td>
+                    <td>${product.current_quantity}</td>
+                    <td></td>
+                    <td>${product.current_quantity}</td>
+                    <td></td>
+                    <td></td>
+                    <td><button class="update-btn" data-product-id="${product.id}" data-product-name="${product.product_name}" data-price="${product.price}" data-start-quantity="${product.start_quantity}">{% trans %}Update{% endtrans %}</button></td>
+                    <td><button type="button" class="delete-btn" data-product-id="${product.id}" data-product-name="${product.product_name}">{% trans %}Delete{% endtrans %}</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            bindRowButtons();
+        }
+
+        function bindRowButtons(){
+            // Rebind update buttons
+            const updateButtonsNow = document.querySelectorAll('.update-btn');
+            updateButtonsNow.forEach(button => {
+                button.removeEventListener && button.removeEventListener('click', null);
+                button.addEventListener('click', () => {
+                    productIdInput.value = button.dataset.productId;
+                    productNameInput.value = button.dataset.productName;
+                    productPriceInput.value = button.dataset.price;
+                    productStartQuantityInput.value = button.dataset.startQuantity;
+                    updateForm.action = `/stock/update/${button.dataset.productId}`;
+                    popup.style.display = 'block';
+                });
+            });
+
+            const deleteButtonsNow = document.querySelectorAll('.delete-btn');
+            deleteButtonsNow.forEach(button => {
+                button.removeEventListener && button.removeEventListener('click', null);
+                button.addEventListener('click', () => {
+                    const productId = button.dataset.productId;
+                    const productName = button.dataset.productName;
+                    deleteMessage.textContent = `Are you sure you want to delete "${productName}"? This action cannot be undone.`;
+                    deleteForm.action = `/stock/delete/${productId}`;
+                    deletePopup.style.display = 'block';
+                });
+            });
+        }
+
+        const debounce = (fn, wait=250)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), wait); }; };
+
+        const doSearch = debounce(async (q)=>{
+            if(!q) return; // don't auto-clear to show everything
+            try{
+                const res = await fetch(`/stock/search?query=${encodeURIComponent(q)}`);
+                if(!res.ok) return;
+                const data = await res.json();
+                renderProducts(data);
+            }catch(err){ console.error('stock search err', err); }
+        }, 250);
+
+        stockSearchInput.addEventListener('input', (e)=>{
+            const q = e.target.value.trim();
+            if(q.length===0){
+                // restore original server-rendered rows by reloading page or fetching all
+                // simplest: reload page to show all
+                location.reload();
+                return;
+            }
+            doSearch(q);
+        });
     </script>
 
 </body>

@@ -124,6 +124,32 @@ def export_stock():
     )
 
 
+def search_stock(query):
+    """Return list of products matching query from stock_view as dicts."""
+    if not query:
+        return []
+    product_name_pattern = f"%{query}%"
+    product_id = int(query) if query.isdigit() else -1
+    with sqlite3.connect(DATABASE_NAME) as conn:
+        c = conn.cursor()
+        c.execute(
+            "SELECT id, product_name, price, start_quantity, current_quantity FROM stock_view WHERE product_name LIKE ? OR id = ? LIMIT 50",
+            (product_name_pattern, product_id),
+        )
+        rows = c.fetchall()
+    results = [
+        {
+            "id": row[0],
+            "product_name": row[1],
+            "price": row[2],
+            "start_quantity": row[3],
+            "current_quantity": row[4],
+        }
+        for row in rows
+    ]
+    return results
+
+
 # Update the database schema
 def init_db():
     with sqlite3.connect(DATABASE_NAME) as conn:
