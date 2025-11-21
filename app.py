@@ -4,6 +4,7 @@ import logging
 import sqlite3
 import os
 import invoice_generator as ig
+import main_invoice_generator as mig
 import stock_manager as sm
 from flask import jsonify  # Import jsonify
 
@@ -48,9 +49,46 @@ def export_pdf():
     return ig.export_complete_invoice()
 
 
+
 @app.route("/clear", methods=["POST"])
 def clear():
     return ig.clear()
+
+
+@app.route("/main_invoice", methods=["GET"])
+def main_invoice():
+    return render_template("main_invoice.html")
+
+
+@app.route("/main_invoice/export", methods=["POST"])
+def export_main_invoice():
+    data = {
+        'invoice_number': request.form.get('invoice_number'),
+        'entries': []
+    }
+    
+    for i in range(1, 26):
+        name = request.form.get(f'name_{i}')
+        if name:  # Only add if name is present, or maybe we want to keep empty rows? 
+                  # The PDF generator handles empty rows by index, but let's pass all data
+            entry = {
+                'name': name,
+                'total': request.form.get(f'total_{i}', ''),
+                'rata_1': request.form.get(f'rata_1_{i}', ''),
+                'rata_2': request.form.get(f'rata_2_{i}', ''),
+                'rata_3': request.form.get(f'rata_3_{i}', ''),
+                'rata_4': request.form.get(f'rata_4_{i}', ''),
+            }
+            data['entries'].append(entry)
+            
+    pdf_buffer = mig.generate_main_invoice_pdf(data)
+    
+    return send_file(
+        pdf_buffer,
+        as_attachment=True,
+        download_name=f"Glavni_Racun_{data['invoice_number']}.pdf",
+        mimetype="application/pdf",
+    )
 
 
 # Stock Management Routes
@@ -142,4 +180,4 @@ def autocomplete():
 if __name__ == "__main__":
     ig.init_db()
     sm.init_db()
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
