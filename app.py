@@ -74,10 +74,7 @@ def export_main_invoice():
             entry = {
                 'name': name,
                 'total': request.form.get(f'total_{i}', ''),
-                'rata_1': request.form.get(f'rata_1_{i}', ''),
-                'rata_2': request.form.get(f'rata_2_{i}', ''),
-                'rata_3': request.form.get(f'rata_3_{i}', ''),
-                'rata_4': request.form.get(f'rata_4_{i}', ''),
+                'phone': request.form.get(f'phone_{i}', ''),
             }
             data['entries'].append(entry)
             

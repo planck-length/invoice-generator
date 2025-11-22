@@ -3,6 +3,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.utils import simpleSplit
 import io
 from flask import send_file
 import datetime
@@ -89,12 +90,9 @@ def generate_main_invoice_pdf(data):
     # Column widths
     col_widths = [
         10*mm,  # Red broj
-        70*mm,  # Prezime i ime kupca
+        115*mm, # Prezime i ime kupca
         25*mm,  # UKUPNO OTPLATA
-        21*mm,  # 1. Rata
-        21*mm,  # 2. Rata
-        21*mm,  # 3. Rata
-        21*mm   # 4. Rata
+        40*mm   # Broj Telefona
     ]
     
     x_positions = [left_margin]
@@ -124,13 +122,8 @@ def generate_main_invoice_pdf(data):
     c.drawString(x_positions[2] + 2*mm, table_top - 8*mm, "OTPLATA")
     c.line(x_positions[2] + 1*mm, table_top - 10*mm, x_positions[3] - 1*mm, table_top - 10*mm)
 
-    # Ratas
-    for i in range(4):
-        c.drawString(x_positions[3+i] + 2*mm, table_top - 4*mm, f"{i+1}. Rata KM")
-        c.setFont("DejaVuSans", 8)
-        c.drawString(x_positions[3+i] + 2*mm, table_top - 8*mm, "dospjeva")
-        c.line(x_positions[3+i] + 1*mm, table_top - 10*mm, x_positions[4+i] - 1*mm, table_top - 10*mm)
-        c.setFont("DejaVuSans-Bold", 9)
+    # Broj Telefona
+    c.drawString(x_positions[3] + 2*mm, table_top - 8*mm, "Broj Telefona")
 
     # Table Rows
     current_y = table_top - 15*mm
@@ -155,13 +148,20 @@ def generate_main_invoice_pdf(data):
             entry = entries[i-1]
             c.setFont("DejaVuSans", 9)
             # Name
-            c.drawString(x_positions[1] + 2*mm, current_y - 4.5*mm, str(entry.get('name', '')))
+            name_text = str(entry.get('name', ''))
+            lines = simpleSplit(name_text, "DejaVuSans", 9, col_widths[1] - 4*mm)
+            
+            if len(lines) == 1:
+                c.drawString(x_positions[1] + 2*mm, current_y - 4.5*mm, lines[0])
+            elif len(lines) > 1:
+                # Draw 2 lines
+                c.drawString(x_positions[1] + 2*mm, current_y - 3*mm, lines[0])
+                c.drawString(x_positions[1] + 2*mm, current_y - 6*mm, lines[1])
+            
             # Total
             c.drawRightString(x_positions[3] - 2*mm, current_y - 4.5*mm, str(entry.get('total', '')))
-            # Ratas
-            for r in range(4):
-                val = entry.get(f'rata_{r+1}', '')
-                c.drawRightString(x_positions[4+r] - 2*mm, current_y - 4.5*mm, str(val))
+            # Phone
+            c.drawString(x_positions[3] + 2*mm, current_y - 4.5*mm, str(entry.get('phone', '')))
         
         current_y -= row_height
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,33 +12,41 @@
             margin: 0 auto;
             padding: 20px;
         }
+
         .invoice-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        .invoice-table th, .invoice-table td {
+
+        .invoice-table th,
+        .invoice-table td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: center;
         }
+
         .invoice-table input {
             width: 100%;
             border: none;
             padding: 5px;
             box-sizing: border-box;
         }
+
         .header-inputs {
             margin-bottom: 20px;
         }
+
         .header-inputs label {
             margin-right: 10px;
             font-weight: bold;
         }
+
         .actions {
             margin-top: 20px;
             text-align: right;
         }
+
         .btn {
             padding: 10px 20px;
             background-color: #4CAF50;
@@ -46,9 +55,11 @@
             cursor: pointer;
             font-size: 16px;
         }
+
         .btn:hover {
             background-color: #45a049;
         }
+
         .back-link {
             display: inline-block;
             margin-bottom: 20px;
@@ -57,11 +68,12 @@
         }
     </style>
 </head>
+
 <body>
     <div class="main-invoice-container">
         <a href="{{ url_for('index') }}" class="back-link">&larr; Back to Home</a>
         <h1>Kreiraj Glavni Račun</h1>
-        
+
         <form action="{{ url_for('export_main_invoice') }}" method="POST">
             <div class="header-inputs">
                 <label for="invoice_number">Broj Računa:</label>
@@ -74,10 +86,7 @@
                         <th style="width: 50px;">Red br.</th>
                         <th>Prezime i ime kupca</th>
                         <th style="width: 100px;">UKUPNO OTPLATA</th>
-                        <th style="width: 80px;">1. Rata</th>
-                        <th style="width: 80px;">2. Rata</th>
-                        <th style="width: 80px;">3. Rata</th>
-                        <th style="width: 80px;">4. Rata</th>
+                        <th style="width: 150px;">Broj Telefona</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -86,10 +95,7 @@
                         <td>{{ i }}</td>
                         <td><input type="text" name="name_{{ i }}"></td>
                         <td><input type="number" step="0.01" name="total_{{ i }}"></td>
-                        <td><input type="number" step="0.01" name="rata_1_{{ i }}"></td>
-                        <td><input type="number" step="0.01" name="rata_2_{{ i }}"></td>
-                        <td><input type="number" step="0.01" name="rata_3_{{ i }}"></td>
-                        <td><input type="number" step="0.01" name="rata_4_{{ i }}"></td>
+                        <td><input type="text" name="phone_{{ i }}"></td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -101,4 +107,5 @@
         </form>
     </div>
 </body>
+
 </html>
