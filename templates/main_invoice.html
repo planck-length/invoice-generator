@@ -86,26 +86,50 @@
                         <th style="width: 50px;">Red br.</th>
                         <th>Prezime i ime kupca</th>
                         <th style="width: 100px;">UKUPNO OTPLATA</th>
-                        <th style="width: 150px;">Broj Telefona</th>
+                        <th style="width: 120px;">M.B</th>
+                        <th style="width: 60px;">Broj Rata</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="invoice-body">
                     {% for i in range(1, 26) %}
                     <tr>
-                        <td>{{ i }}</td>
+                        <td class="row-num">{{ i }}</td>
                         <td><input type="text" name="name_{{ i }}"></td>
                         <td><input type="number" step="0.01" name="total_{{ i }}"></td>
-                        <td><input type="text" name="phone_{{ i }}"></td>
+                        <td><input type="text" name="mb_{{ i }}"></td>
+                        <td><input type="number" name="broj_rata_{{ i }}"></td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+
+            <div style="margin-top: 10px;">
+                <button type="button" id="add-row-btn" class="btn" style="background-color: #2196F3;">Add Row</button>
+            </div>
 
             <div class="actions">
                 <button type="submit" class="btn">Generate PDF</button>
             </div>
         </form>
     </div>
+
+    <script>
+        document.getElementById('add-row-btn').addEventListener('click', function () {
+            const tbody = document.getElementById('invoice-body');
+            const rowCount = tbody.rows.length;
+            const newRowIndex = rowCount + 1;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="row-num">${newRowIndex}</td>
+                <td><input type="text" name="name_${newRowIndex}"></td>
+                <td><input type="number" step="0.01" name="total_${newRowIndex}"></td>
+                <td><input type="text" name="mb_${newRowIndex}"></td>
+                <td><input type="number" name="broj_rata_${newRowIndex}"></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    </script>
 </body>
 
 </html>

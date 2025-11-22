@@ -67,14 +67,27 @@ def export_main_invoice():
         'entries': []
     }
     
-    for i in range(1, 26):
+    for i in range(1, 200): # Support up to 200 rows
         name = request.form.get(f'name_{i}')
-        if name:  # Only add if name is present, or maybe we want to keep empty rows? 
-                  # The PDF generator handles empty rows by index, but let's pass all data
+        # If we are past row 25 and name is empty, we can probably stop, 
+        # but let's just check if any field is present to be safe, or just rely on name.
+        # The user might skip rows? Unlikely.
+        # If name is empty but we are within the first 25 rows, we should keep it (as empty row).
+        # If name is empty and i > 25, we can likely stop.
+        
+        if i > 25 and not name:
+             # Check if other fields are present just in case
+             if not any([request.form.get(f'total_{i}'), request.form.get(f'mb_{i}')]):
+                 continue # Or break? Let's continue to be safe against gaps, but break if many consecutive empty?
+                 # For simplicity, let's just include it if it has a name, OR if i <= 25.
+                 pass
+        
+        if i <= 25 or name:
             entry = {
-                'name': name,
+                'name': name if name else '',
                 'total': request.form.get(f'total_{i}', ''),
-                'phone': request.form.get(f'phone_{i}', ''),
+                'mb': request.form.get(f'mb_{i}', ''),
+                'broj_rata': request.form.get(f'broj_rata_{i}', ''),
             }
             data['entries'].append(entry)
             
