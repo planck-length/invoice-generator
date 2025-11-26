@@ -95,17 +95,20 @@ def draw_header(c, width, height, data, x_positions, col_widths):
     # Prezime i ime
     c.drawString(x_positions[1] + 15*mm, table_top - 8*mm, "Prezime i ime kupca")
     
+    # Broj Telefona (New)
+    c.drawString(x_positions[2] + 2*mm, table_top - 8*mm, "Br. Telefona")
+    
     # Ukupno Otplata
-    c.drawString(x_positions[2] + 2*mm, table_top - 4*mm, "UKUPNO")
-    c.drawString(x_positions[2] + 2*mm, table_top - 8*mm, "OTPLATA")
-    c.line(x_positions[2] + 1*mm, table_top - 10*mm, x_positions[3] - 1*mm, table_top - 10*mm)
+    c.drawString(x_positions[3] + 2*mm, table_top - 4*mm, "UKUPNO")
+    c.drawString(x_positions[3] + 2*mm, table_top - 8*mm, "OTPLATA")
+    c.line(x_positions[3] + 1*mm, table_top - 10*mm, x_positions[4] - 1*mm, table_top - 10*mm)
 
     # M.B
-    c.drawString(x_positions[3] + 2*mm, table_top - 8*mm, "M.B")
+    c.drawString(x_positions[4] + 2*mm, table_top - 8*mm, "M.B")
     
     # Broj Rata
-    c.drawString(x_positions[4] + 1*mm, table_top - 4*mm, "Broj")
-    c.drawString(x_positions[4] + 1*mm, table_top - 8*mm, "Rata")
+    c.drawString(x_positions[5] + 1*mm, table_top - 4*mm, "Broj")
+    c.drawString(x_positions[5] + 1*mm, table_top - 8*mm, "Rata")
 
     return table_top - 15*mm # Return current_y
 
@@ -135,9 +138,11 @@ def generate_main_invoice_pdf(data):
     left_margin = 10 * mm
     
     # Column widths
+    # Total available: 190mm
     col_widths = [
         10*mm,  # Red broj
-        105*mm, # Prezime i ime kupca
+        65*mm,  # Prezime i ime kupca (Reduced from 105mm)
+        40*mm,  # Broj Telefona (New)
         25*mm,  # UKUPNO OTPLATA
         35*mm,  # M.B
         15*mm   # Broj Rata
@@ -192,15 +197,18 @@ def generate_main_invoice_pdf(data):
             elif len(lines) > 1:
                 c.drawString(x_positions[1] + 2*mm, current_y - 3*mm, lines[0])
                 c.drawString(x_positions[1] + 2*mm, current_y - 6*mm, lines[1])
+            
+            # Phone (New)
+            c.drawString(x_positions[2] + 2*mm, current_y - 4.5*mm, str(entry.get('phone', '')))
                 
             # Total
-            c.drawRightString(x_positions[3] - 2*mm, current_y - 4.5*mm, str(entry.get('total', '')))
+            c.drawRightString(x_positions[3] + col_widths[3] - 2*mm, current_y - 4.5*mm, str(entry.get('total', '')))
             
             # M.B
-            c.drawString(x_positions[3] + 2*mm, current_y - 4.5*mm, str(entry.get('mb', '')))
+            c.drawString(x_positions[4] + 2*mm, current_y - 4.5*mm, str(entry.get('mb', '')))
             
             # Broj Rata
-            c.drawRightString(x_positions[5] - 2*mm, current_y - 4.5*mm, str(entry.get('broj_rata', '')))
+            c.drawRightString(x_positions[5] + col_widths[5] - 2*mm, current_y - 4.5*mm, str(entry.get('broj_rata', '')))
             
         current_y -= row_height
         

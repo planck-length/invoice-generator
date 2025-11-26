@@ -85,6 +85,7 @@ def export_main_invoice():
         if i <= 25 or name:
             entry = {
                 'name': name if name else '',
+                'phone': request.form.get(f'phone_{i}', ''),
                 'total': request.form.get(f'total_{i}', ''),
                 'mb': request.form.get(f'mb_{i}', ''),
                 'broj_rata': request.form.get(f'broj_rata_{i}', ''),

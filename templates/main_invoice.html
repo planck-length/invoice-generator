@@ -85,6 +85,7 @@
                     <tr>
                         <th style="width: 50px;">Red br.</th>
                         <th>Prezime i ime kupca</th>
+                        <th style="width: 120px;">Broj Telefona</th>
                         <th style="width: 100px;">UKUPNO OTPLATA</th>
                         <th style="width: 120px;">M.B</th>
                         <th style="width: 60px;">Broj Rata</th>
@@ -95,6 +96,7 @@
                     <tr>
                         <td class="row-num">{{ i }}</td>
                         <td><input type="text" name="name_{{ i }}"></td>
+                        <td><input type="text" name="phone_{{ i }}"></td>
                         <td><input type="number" step="0.01" name="total_{{ i }}"></td>
                         <td><input type="text" name="mb_{{ i }}"></td>
                         <td><input type="number" name="broj_rata_{{ i }}"></td>
@@ -123,6 +125,7 @@
             tr.innerHTML = `
                 <td class="row-num">${newRowIndex}</td>
                 <td><input type="text" name="name_${newRowIndex}"></td>
+                <td><input type="text" name="phone_${newRowIndex}"></td>
                 <td><input type="number" step="0.01" name="total_${newRowIndex}"></td>
                 <td><input type="text" name="mb_${newRowIndex}"></td>
                 <td><input type="number" name="broj_rata_${newRowIndex}"></td>
