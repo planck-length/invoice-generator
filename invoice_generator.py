@@ -27,7 +27,7 @@ def init_db():
         c.execute(
             """CREATE TABLE IF NOT EXISTS sales (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        product_id INTEGER,
+                        product_id TEXT,
                         quantity INTEGER,
                         invoice_id INTEGER,
                         price REAL,
@@ -45,7 +45,7 @@ def init_db():
         )
         c.execute(
             """CREATE TABLE IF NOT EXISTS product(
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        id TEXT PRIMARY KEY,
                         name TEXT,
                         price REAL,
                         start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -32,7 +32,7 @@ def draw_header(c, width, height, data, x_positions, col_widths):
     except Exception:
         c.circle(left_margin + 15*mm, height - top_margin - 15*mm, 10*mm)
     
-    # Company Name
+    # Company Namels
     c.setFont("DejaVuSans-Bold", 24)
     c.drawString(left_margin + 35*mm, height - top_margin - 10*mm, '"UNA TEKSTIL"')
     

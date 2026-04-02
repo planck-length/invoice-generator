@@ -38,7 +38,7 @@ def test_db(monkeypatch):
         c.execute(
             """CREATE TABLE IF NOT EXISTS sales (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        product_id INTEGER,
+                        product_id TEXT,
                         quantity INTEGER,
                         invoice_id INTEGER,
                         price REAL,
@@ -56,7 +56,7 @@ def test_db(monkeypatch):
         )
         c.execute(
             """CREATE TABLE IF NOT EXISTS product(
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        id TEXT PRIMARY KEY,
                         name TEXT,
                         price REAL,
                         start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -67,7 +67,7 @@ def test_db(monkeypatch):
         c.execute(
             """CREATE TABLE IF NOT EXISTS stock (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        product_id INTEGER,
+                        product_id TEXT,
                         product_name TEXT,
                         start_quantity INTEGER,
                         created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -121,13 +121,13 @@ def client(test_db, monkeypatch):
 @pytest.fixture
 def sample_product(test_db):
     """Create a sample product in the test database."""
+    product_id = "SAMPLE-01"
     with sqlite3.connect(test_db) as conn:
         c = conn.cursor()
         c.execute(
-            "INSERT INTO product (name, price, is_current) VALUES (?, ?, ?)",
-            ("Test Product", 10.50, True)
+            "INSERT INTO product (id, name, price, is_current) VALUES (?, ?, ?, ?)",
+            (product_id, "Test Product", 10.50, True)
         )
-        product_id = c.lastrowid
         c.execute(
             "INSERT INTO stock (product_id, product_name, start_quantity) VALUES (?, ?, ?)",
             (product_id, "Test Product", 100)

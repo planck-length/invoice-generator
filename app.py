@@ -120,12 +120,12 @@ def add_stock_item():
     return sm.add_stock_item()
 
 
-@app.route("/stock/update/<int:product_id>", methods=["POST"])
+@app.route("/stock/update/<product_id>", methods=["POST"])
 def update_stock_item(product_id):
     return sm.update_stock_item(product_id)
 
 
-@app.route("/stock/delete/<int:product_id>", methods=["POST"])
+@app.route("/stock/delete/<product_id>", methods=["POST"])
 def delete_stock_item(product_id):
     return sm.delete_stock_item(product_id)
 
@@ -148,7 +148,7 @@ def product_details():
             c = conn.cursor()
             c.execute(
                 "SELECT name,price FROM product WHERE id = ?",
-                (int(product_id),),  # Important: Cast product_id to integer
+                (product_id,),  # Pass as string
             )
             product = c.fetchone()
 
@@ -156,7 +156,8 @@ def product_details():
                 return jsonify({"product_name": product[0], "price": product[1]})
             else:
                 return jsonify({})  # Return empty object if product not found
-    except ValueError:  # Handle non-integer input
+    except Exception as e:
+        logger.error(f"Error fetching product_details: {e}")
         return jsonify({})
 
 
@@ -171,7 +172,8 @@ def autocomplete():
         c = conn.cursor()
         # Search by both ID and name
         product_name_pattern = f"%{query}%"
-        product_id = int(query) if query.isdigit() else 0
+        product_id = query
+
         c.execute("""
             SELECT id, product_name, price 
             FROM stock_view 

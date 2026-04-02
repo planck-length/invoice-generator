@@ -37,6 +37,7 @@ def stock_management():
 
 
 def add_stock_item():
+    product_id = request.form.get("product_id")
     product_name = request.form.get("product_name")
     price = float(request.form.get("price"))
     start_quantity = int(request.form.get("start_quantity"))
@@ -44,10 +45,14 @@ def add_stock_item():
     with sqlite3.connect(DATABASE_NAME) as conn:
         conn.set_trace_callback(print)
         c = conn.cursor()
-        max_id = c.execute("SELECT COALESCE(MAX(id),0) FROM product").fetchone()[0]
-        product_id = max_id + 1
+        
+        # Check if product_id exists
+        c.execute("SELECT id FROM product WHERE id = ?", (product_id,))
+        if c.fetchone():
+            return "Error: Product ID already exists. Please choose a different one.", 400
+
         c.execute(
-            "INSERT INTO product (name,price) VALUES (?, ?)", (product_name, price)
+            "INSERT INTO product (id, name, price) VALUES (?, ?, ?)", (product_id, product_name, price)
         )
         c.execute(
             "INSERT INTO stock (product_id, product_name, start_quantity) VALUES (?, ?, ?)",
@@ -60,18 +65,35 @@ def add_stock_item():
 
 
 def update_stock_item(product_id):
+    new_product_id = request.form.get("new_product_id")
+    product_name = request.form.get("product_name")
     price = float(request.form.get("price"))
     start_quantity = int(request.form.get("start_quantity"))
 
     with sqlite3.connect(DATABASE_NAME) as conn:
         c = conn.cursor()
+        
+        # If product_id changes, check if the new one exists
+        if new_product_id and new_product_id != str(product_id):
+            c.execute("SELECT id FROM product WHERE id = ?", (new_product_id,))
+            if c.fetchone():
+                return f"Error: Product ID {new_product_id} already exists.", 400
+
+        target_id = new_product_id if new_product_id else product_id
+
+        # To avoid foreign key issues or simple updates, update in all tables
+        # Since we might be changing the PK, update sales, stock, then product
         c.execute(
-            "UPDATE product SET price = ? WHERE id = ?",
-            (price, product_id),
+            "UPDATE sales SET product_id = ? WHERE product_id = ?",
+            (target_id, product_id)
         )
         c.execute(
-            "UPDATE stock SET start_quantity = ?, updated_date = CURRENT_TIMESTAMP WHERE product_id = ? ",
-            (start_quantity, product_id),
+            "UPDATE stock SET product_id = ?, product_name = ?, start_quantity = ?, updated_date = CURRENT_TIMESTAMP WHERE product_id = ?",
+            (target_id, product_name, start_quantity, product_id),
+        )
+        c.execute(
+            "UPDATE product SET id = ?, name = ?, price = ? WHERE id = ?",
+            (target_id, product_name, price, product_id),
         )
         conn.commit()
 
@@ -129,7 +151,7 @@ def search_stock(query):
     if not query:
         return []
     product_name_pattern = f"%{query}%"
-    product_id = int(query) if query.isdigit() else -1
+    product_id = query
     with sqlite3.connect(DATABASE_NAME) as conn:
         c = conn.cursor()
         c.execute(
@@ -158,7 +180,7 @@ def init_db():
         c.execute(
             """CREATE TABLE IF NOT EXISTS stock (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        product_id INTEGER,
+                        product_id TEXT,
                         product_name TEXT,
                         start_quantity INTEGER,
                         created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

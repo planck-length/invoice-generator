@@ -15,6 +15,9 @@
     </form>
     <form action="/stock/add" method="POST">
         <h3>{% trans %}Add Product{% endtrans %}</h3>
+        <label for="add_product_id">{% trans %}Product ID / Code:{% endtrans %}</label>
+        <input type="text" id="add_product_id" name="product_id" required>
+
         <label for="product_name">{% trans %}Product Name:{% endtrans %}</label>
         <input type="text" id="product_name" name="product_name" required>
 
@@ -86,6 +89,10 @@
         <form id="updateForm" method="POST">
             <h3>{% trans %}Update Product{% endtrans %}</h3>
             <input type="hidden" name="product_id" id="productId">
+            
+            <label for="newProductId">{% trans %}Product ID:{% endtrans %}</label>
+            <input type="text" id="newProductId" name="new_product_id" required><br><br>
+
             <label for="productName">{% trans %}Product Name:{% endtrans %}</label>
             <input type="text" id="productName" name="product_name" required><br><br>
 
@@ -121,6 +128,7 @@
         const closePopupButton = document.getElementById('closePopup');
         const updateForm = document.getElementById('updateForm');
         const productIdInput = document.getElementById('productId');
+        const newProductIdInput = document.getElementById('newProductId');
         const productNameInput = document.getElementById('productName');
         const productPriceInput = document.getElementById('productPrice');
         const productStartQuantityInput = document.getElementById('productStartQuantity');
@@ -129,6 +137,7 @@
         updateButtons.forEach(button => {
             button.addEventListener('click', () => {
                 productIdInput.value = button.dataset.productId;
+                newProductIdInput.value = button.dataset.productId;
                 productNameInput.value = button.dataset.productName;
                 productPriceInput.value = button.dataset.price;
                 productStartQuantityInput.value = button.dataset.startQuantity;
@@ -196,6 +205,7 @@
                 button.removeEventListener && button.removeEventListener('click', null);
                 button.addEventListener('click', () => {
                     productIdInput.value = button.dataset.productId;
+                    newProductIdInput.value = button.dataset.productId;
                     productNameInput.value = button.dataset.productName;
                     productPriceInput.value = button.dataset.price;
                     productStartQuantityInput.value = button.dataset.startQuantity;

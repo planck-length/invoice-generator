@@ -27,6 +27,7 @@ def test_init_db(test_db):
 def test_add_stock_item(test_db, client):
     """Test adding a stock item."""
     response = client.post('/stock/add', data={
+        'product_id': 'TEST-01',
         'product_name': 'New Product',
         'price': 25.50,
         'start_quantity': 50
@@ -52,6 +53,8 @@ def test_add_stock_item(test_db, client):
 def test_update_stock_item(test_db, client, sample_product):
     """Test updating a stock item."""
     response = client.post(f'/stock/update/{sample_product}', data={
+        'new_product_id': sample_product,  # unchanged ID
+        'product_name': 'Updated Product',
         'price': 15.75,
         'start_quantity': 200
     }, follow_redirects=True)
