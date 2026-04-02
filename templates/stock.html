@@ -15,6 +15,9 @@
     </form>
     <form action="/stock/add" method="POST">
         <h3>{% trans %}Add Product{% endtrans %}</h3>
+        <label for="add_product_id">{% trans %}Product ID / Code:{% endtrans %}</label>
+        <input type="text" id="add_product_id" name="product_id" required>
+
         <label for="product_name">{% trans %}Product Name:{% endtrans %}</label>
         <input type="text" id="product_name" name="product_name" required>
 
@@ -29,6 +32,8 @@
 
     <div class="table-container">
         <h3>{% trans %}Current Stock{% endtrans %}</h3>
+        <label for="stock-search">{% trans %}Search products:{% endtrans %}</label>
+        <input type="text" id="stock-search" placeholder="Type product name or id to search">
         <table>
             <thead>
                 <tr>
@@ -42,6 +47,7 @@
                     <th>{% trans %}Total Amount Current{% endtrans %}</th>
                     <th>{% trans %}Invoices{% endtrans %}</th>
                     <th>{% trans %}Update{% endtrans %}</th>
+                    <th>{% trans %}Delete{% endtrans %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -60,6 +66,9 @@
                         <button class="update-btn" data-product-id="{{ product[0] }}" data-product-name="{{ product[1] }}"
                             data-price="{{ product[2] }}" data-start-quantity="{{ product[3] }}">{% trans %}Update{% endtrans %}</button>
                     </td>
+                    <td>
+                        <button type="button" class="delete-btn" data-product-id="{{ product[0] }}" data-product-name="{{ product[1] }}">{% trans %}Delete{% endtrans %}</button>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -70,7 +79,7 @@
                     <td>{{ total_amount_sold }}</td> <!-- Total Current Quantity -->
                     <td>{{ total_quantity_current }}</td> <!-- Total Current Amount -->
                     <td>{{ total_amount_current }}</td> <!-- Total Current Amount -->
-                    <td colspan="2"></td>
+                    <td colspan="3"></td>
                 </tr>
             </tfoot>
         </table>
@@ -80,6 +89,10 @@
         <form id="updateForm" method="POST">
             <h3>{% trans %}Update Product{% endtrans %}</h3>
             <input type="hidden" name="product_id" id="productId">
+            
+            <label for="newProductId">{% trans %}Product ID:{% endtrans %}</label>
+            <input type="text" id="newProductId" name="new_product_id" required><br><br>
+
             <label for="productName">{% trans %}Product Name:{% endtrans %}</label>
             <input type="text" id="productName" name="product_name" required><br><br>
 
@@ -94,6 +107,17 @@
         </form>
     </div>
 
+    <div id="deletePopup" class="popup">
+        <div>
+            <h3>{% trans %}Confirm Delete{% endtrans %}</h3>
+            <p id="deleteMessage"></p>
+            <form id="deleteForm" method="POST">
+                <button type="submit" class="delete-btn">{% trans %}Yes, Delete{% endtrans %}</button>
+                <button type="button" id="cancelDelete">{% trans %}Cancel{% endtrans %}</button>
+            </form>
+        </div>
+    </div>
+
     <form action="/stock/export" method="GET">
         <button type="submit">{% trans %}Export Stock{% endtrans %}</button>
     </form>
@@ -104,6 +128,7 @@
         const closePopupButton = document.getElementById('closePopup');
         const updateForm = document.getElementById('updateForm');
         const productIdInput = document.getElementById('productId');
+        const newProductIdInput = document.getElementById('newProductId');
         const productNameInput = document.getElementById('productName');
         const productPriceInput = document.getElementById('productPrice');
         const productStartQuantityInput = document.getElementById('productStartQuantity');
@@ -112,6 +137,7 @@
         updateButtons.forEach(button => {
             button.addEventListener('click', () => {
                 productIdInput.value = button.dataset.productId;
+                newProductIdInput.value = button.dataset.productId;
                 productNameInput.value = button.dataset.productName;
                 productPriceInput.value = button.dataset.price;
                 productStartQuantityInput.value = button.dataset.startQuantity;
@@ -125,6 +151,104 @@
             popup.style.display = 'none';
         });
 
+        // Handle delete button clicks with confirmation modal
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        const deletePopup = document.getElementById('deletePopup');
+        const deleteForm = document.getElementById('deleteForm');
+        const deleteMessage = document.getElementById('deleteMessage');
+        const cancelDeleteButton = document.getElementById('cancelDelete');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.dataset.productId;
+                const productName = button.dataset.productName;
+                deleteMessage.textContent = `Are you sure you want to delete "${productName}"? This action cannot be undone.`;
+                deleteForm.action = `/stock/delete/${productId}`;
+                deletePopup.style.display = 'block';
+            });
+        });
+
+        cancelDeleteButton.addEventListener('click', () => {
+            deletePopup.style.display = 'none';
+        });
+
+        // Stock search
+        const stockSearchInput = document.getElementById('stock-search');
+        const tbody = document.querySelector('.table-container table tbody');
+
+        function renderProducts(products){
+            tbody.innerHTML = '';
+            products.forEach(product => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${product.id}</td>
+                    <td>${product.product_name}</td>
+                    <td>${product.price}</td>
+                    <td>${product.start_quantity}</td>
+                    <td>${product.current_quantity}</td>
+                    <td></td>
+                    <td>${product.current_quantity}</td>
+                    <td></td>
+                    <td></td>
+                    <td><button class="update-btn" data-product-id="${product.id}" data-product-name="${product.product_name}" data-price="${product.price}" data-start-quantity="${product.start_quantity}">{% trans %}Update{% endtrans %}</button></td>
+                    <td><button type="button" class="delete-btn" data-product-id="${product.id}" data-product-name="${product.product_name}">{% trans %}Delete{% endtrans %}</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            bindRowButtons();
+        }
+
+        function bindRowButtons(){
+            // Rebind update buttons
+            const updateButtonsNow = document.querySelectorAll('.update-btn');
+            updateButtonsNow.forEach(button => {
+                button.removeEventListener && button.removeEventListener('click', null);
+                button.addEventListener('click', () => {
+                    productIdInput.value = button.dataset.productId;
+                    newProductIdInput.value = button.dataset.productId;
+                    productNameInput.value = button.dataset.productName;
+                    productPriceInput.value = button.dataset.price;
+                    productStartQuantityInput.value = button.dataset.startQuantity;
+                    updateForm.action = `/stock/update/${button.dataset.productId}`;
+                    popup.style.display = 'block';
+                });
+            });
+
+            const deleteButtonsNow = document.querySelectorAll('.delete-btn');
+            deleteButtonsNow.forEach(button => {
+                button.removeEventListener && button.removeEventListener('click', null);
+                button.addEventListener('click', () => {
+                    const productId = button.dataset.productId;
+                    const productName = button.dataset.productName;
+                    deleteMessage.textContent = `Are you sure you want to delete "${productName}"? This action cannot be undone.`;
+                    deleteForm.action = `/stock/delete/${productId}`;
+                    deletePopup.style.display = 'block';
+                });
+            });
+        }
+
+        const debounce = (fn, wait=250)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), wait); }; };
+
+        const doSearch = debounce(async (q)=>{
+            if(!q) return; // don't auto-clear to show everything
+            try{
+                const res = await fetch(`/stock/search?query=${encodeURIComponent(q)}`);
+                if(!res.ok) return;
+                const data = await res.json();
+                renderProducts(data);
+            }catch(err){ console.error('stock search err', err); }
+        }, 250);
+
+        stockSearchInput.addEventListener('input', (e)=>{
+            const q = e.target.value.trim();
+            if(q.length===0){
+                // restore original server-rendered rows by reloading page or fetching all
+                // simplest: reload page to show all
+                location.reload();
+                return;
+            }
+            doSearch(q);
+        });
     </script>
 
 </body>

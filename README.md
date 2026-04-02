@@ -27,23 +27,103 @@ This Python-based invoice manager provides a basic web interface for creating in
 * **`stock_manager.css`:** Styles for the stock management page.
 * **`database.db`:** SQLite database file.
 * **`messages.pot`, `messages.po`, `messages.mo`:** Files related to internationalization and translation using gettext.
-* **`requirements.txt`:** Lists project dependencies.
+* **`pyproject.toml`:** Poetry configuration file with project dependencies.
+* **`tests/`:** Test suite using pytest with unit and integration tests.
 
 
 ## Installation
 
+### Prerequisites
+
+- Python 3.8 or higher
+- Poetry (for dependency management)
+
+### Install Poetry
+
+If you don't have Poetry installed, follow the [official Poetry installation guide](https://python-poetry.org/docs/#installation).
+
+### Setup Steps
+
 1.  Clone the repository.
-2.  Create a virtual environment: `python3 -m venv venv`
-3.  Activate the virtual environment: `source venv/bin/activate` (Linux/macOS) or `venv\Scripts\activate` (Windows)
-4.  Install dependencies: `pip install -r requirements.txt`
-5.  Initialize the database (if not already created): run `init_db()` function from `invoice_generator.py` and `init_db` from `stock_manager.py`.  Consider adding a separate script or CLI command for this.
-6.  Run the Flask app: `python app.py`
+2.  Install dependencies using Poetry:
+    ```bash
+    poetry install
+    ```
+    This will create a virtual environment and install all dependencies (including development dependencies for testing).
+3.  Activate the Poetry shell:
+    ```bash
+    poetry shell
+    ```
+    Or run commands using `poetry run`:
+    ```bash
+    poetry run python app.py
+    ```
+4.  Initialize the database (if not already created): The database is automatically initialized when you run the app for the first time. The `init_db()` functions from `invoice_generator.py` and `stock_manager.py` are called automatically.
+5.  Set environment variables (optional):
+    ```bash
+    export SECRET_KEY="your-secret-key-here"  # Linux/macOS
+    # or
+    set SECRET_KEY=your-secret-key-here  # Windows
+    ```
+    If not set, a default development key will be used.
+6.  Run the Flask app:
+    ```bash
+    poetry run python app.py
+    ```
+    Or if you're in the Poetry shell:
+    ```bash
+    python app.py
+    ```
 
 ## Usage
 
 1.  Access the invoice generator at `http://127.0.0.1:5000/` (or the appropriate address).
 2.  Access the stock manager at `http://127.0.0.1:5000/stock`
 
+## Testing
+
+The project includes comprehensive test coverage using pytest. Tests are located in the `tests/` directory.
+
+### Running Tests
+
+To run all tests:
+```bash
+poetry run pytest
+```
+
+To run tests with coverage report:
+```bash
+poetry run pytest --cov
+```
+
+To run specific test files:
+```bash
+poetry run pytest tests/test_invoice_generator.py
+poetry run pytest tests/test_stock_manager.py
+poetry run pytest tests/test_app.py
+```
+
+To run tests with verbose output:
+```bash
+poetry run pytest -v
+```
+
+### Test Structure
+
+- **`tests/conftest.py`**: Pytest fixtures for test database and Flask test client
+- **`tests/test_invoice_generator.py`**: Unit tests for invoice generation functions
+- **`tests/test_stock_manager.py`**: Unit tests for stock management functions
+- **`tests/test_app.py`**: Integration tests for Flask routes and endpoints
+
+### Test Coverage
+
+The test suite covers:
+- Database initialization and schema
+- Invoice creation, item management, and PDF export
+- Stock management operations (add, update, delete, export)
+- Flask route handlers and form submissions
+- JSON API endpoints
+- Error handling and edge cases
 
 ## Further Development
 
@@ -51,4 +131,4 @@ This Python-based invoice manager provides a basic web interface for creating in
 * **More Robust Invoice Features:**  Add features like discounts, taxes, and more detailed product information.
 * **User Authentication:**  Implement user authentication to restrict access to the application.
 * **Enhanced Reporting:** More comprehensive reports for sales and stock data.
-* **Testing:** Add unit tests to ensure code quality and prevent regressions.
+* **CI/CD Integration:** Set up continuous integration to run tests automatically on commits and pull requests.
